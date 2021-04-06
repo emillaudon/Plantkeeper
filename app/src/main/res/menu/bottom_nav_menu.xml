@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/home"
+        android:icon="@drawable/home_foreground" />
+    <item
+        android:id="@+id/add"
+        android:icon="@drawable/new_foreground"/>
+    <item
+        android:id="@+id/user"
+        android:icon="@drawable/user_foreground"/>
+</menu>
