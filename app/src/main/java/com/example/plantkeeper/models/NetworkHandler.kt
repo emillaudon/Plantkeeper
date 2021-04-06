@@ -104,12 +104,8 @@ class NetworkHandler {
 
         val url = URL(postUrl + "/new/" + user.uid)
 
-        val jsonObject = JSONObject()
-
-        jsonObject.put("title", plant.name)
-        jsonObject.put("image", imageUrl)
-
-        val body = jsonObject.toString()
+        val jsonPlant = createJsonPlant(plant, imageUrl)
+        val body = jsonPlant.toString()
 
         user.getIdToken(true)
             .addOnSuccessListener { result ->
@@ -148,6 +144,19 @@ class NetworkHandler {
                 })
                 thread.start()
             }
+    }
+
+    private fun createJsonPlant(plant: Plant, imageUrl: String): JSONObject {
+        val jsonObject = JSONObject()
+
+        jsonObject.put("title", plant.name)
+        jsonObject.put("image", imageUrl)
+        jsonObject.put("watering", plant.wateringFreq)
+        jsonObject.put("temperature", plant.temperature)
+        jsonObject.put("sunlight", plant.sunlight)
+        jsonObject.put("note", plant.note)
+
+        return jsonObject
     }
 
     fun getImageUri(inContext: Context, inImage: Bitmap): Uri? {

@@ -57,6 +57,8 @@ class CreateFragment : Fragment() {
     lateinit var sunlightBar: ProgressBar
     lateinit var temperatureBar: ProgressBar
 
+    lateinit var noteEditText: EditText
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -73,6 +75,8 @@ class CreateFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.fragment_create, container, false)
         saveButton = rootView.findViewById(R.id.savebutton)
         image = rootView.findViewById(R.id.imageChosen)
+
+        noteEditText = rootView.findViewById(R.id.note)
 
         wateringBar = rootView.findViewById(R.id.progressBarWatering)
         sunlightBar = rootView.findViewById(R.id.progressBarSunlight)
@@ -99,7 +103,12 @@ class CreateFragment : Fragment() {
 
         saveButton.setOnClickListener {
             val text = rootView.findViewById<EditText>(R.id.postName).text.toString()
-            val newPost = Plant(img, text)
+
+            val watering = wateringBar.progress
+            val temperature = temperatureBar.progress
+            val sunlight = sunlightBar.progress
+
+            val newPost = Plant(img, text, watering, temperature, sunlight, noteEditText.text.toString())
             val handler = NetworkHandler()
 
             handler.newPlant(newPost, imgPath)
