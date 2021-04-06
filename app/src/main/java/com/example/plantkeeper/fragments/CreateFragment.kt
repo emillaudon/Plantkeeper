@@ -20,6 +20,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.example.plantkeeper.R
+import com.example.plantkeeper.models.NetworkHandler
 import com.example.plantkeeper.models.Post
 import kotlinx.android.synthetic.main.fragment_create.*
 
@@ -48,6 +49,7 @@ class CreateFragment : Fragment() {
     lateinit var saveButton: Button
 
     lateinit var img: Bitmap
+    lateinit var imgPath: String
 
     lateinit var image: ImageView
 
@@ -78,6 +80,9 @@ class CreateFragment : Fragment() {
         saveButton.setOnClickListener {
             val text = rootView.findViewById<EditText>(R.id.postName).text.toString()
             val newPost = Post(img, text)
+            val handler = NetworkHandler()
+
+            handler.newPost(newPost, imgPath)
 
             val newFragment: Fragment = HomeFragment(newPost)
             val transaction: FragmentTransaction = fragmentManager!!.beginTransaction()
@@ -105,6 +110,7 @@ class CreateFragment : Fragment() {
             val columnIndex = cursor?.getColumnIndex(filePathColumn[0])
             val picturePath = cursor?.getString(columnIndex!!)
             cursor?.close()
+            imgPath = picturePath!!
             img = BitmapFactory.decodeFile(picturePath)
             image.setImageBitmap(img)
             image.scaleType = ImageView.ScaleType.CENTER_CROP;

@@ -1,7 +1,9 @@
 package com.example.plantkeeper.activities
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -9,6 +11,7 @@ import com.example.plantkeeper.R
 import com.example.plantkeeper.fragments.CreateFragment
 import com.example.plantkeeper.fragments.HomeFragment
 import com.example.plantkeeper.fragments.ProfileFragment
+import com.example.plantkeeper.models.NetworkHandler
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -49,6 +52,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setCurrentFragment(fragment: Fragment) {
+        val handler = NetworkHandler()
+        handler.get()
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.flFragment,fragment)
             commit()
@@ -56,7 +61,9 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     fun replaceFragments(fragmentClass: Class<*>) {
+
         var fragment: Fragment? = null
         try {
             fragment = fragmentClass.newInstance() as Fragment
