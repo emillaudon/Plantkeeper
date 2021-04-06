@@ -2,26 +2,27 @@ package com.example.plantkeeper.fragments
 
 import android.Manifest
 import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.example.plantkeeper.R
 import com.example.plantkeeper.models.NetworkHandler
 import com.example.plantkeeper.models.Plant
+import kotlinx.android.synthetic.main.fragment_create.*
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -52,6 +53,10 @@ class CreateFragment : Fragment() {
 
     lateinit var image: ImageView
 
+    lateinit var wateringBar: ProgressBar
+    lateinit var sunlightBar: ProgressBar
+    lateinit var temperatureBar: ProgressBar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -59,6 +64,7 @@ class CreateFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -68,6 +74,19 @@ class CreateFragment : Fragment() {
         saveButton = rootView.findViewById(R.id.savebutton)
         image = rootView.findViewById(R.id.imageChosen)
 
+        wateringBar = rootView.findViewById(R.id.progressBarWatering)
+        sunlightBar = rootView.findViewById(R.id.progressBarSunlight)
+        temperatureBar = rootView.findViewById(R.id.progressBarTemperature)
+
+        val barList = listOf<ProgressBar>(wateringBar, sunlightBar, temperatureBar)
+
+        barList.forEach {bar ->
+            bar.setOnClickListener {
+                showDialogFor(bar)
+            }
+        }
+
+
         image.setOnClickListener {
             verifyStoragePermissions(activity)
             val i = Intent(
@@ -75,6 +94,8 @@ class CreateFragment : Fragment() {
             )
             startActivityForResult(i, RESULT_LOAD_IMAGE)
         }
+
+
 
         saveButton.setOnClickListener {
             val text = rootView.findViewById<EditText>(R.id.postName).text.toString()
@@ -118,6 +139,45 @@ class CreateFragment : Fragment() {
             Toast.makeText(activity, "Try Again!!", Toast.LENGTH_SHORT).show()
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    fun showDialogFor(bar: ProgressBar) {
+        val d = Dialog(context!!)
+        d.setTitle("NumberPicker")
+        d.setContentView(R.layout.dialog)
+        val b1 = d.findViewById(R.id.button1) as Button
+        val b2 = d.findViewById(R.id.button2) as Button
+        val title = d.findViewById(R.id.dialogTitle) as TextView
+        val np = d.findViewById(R.id.numberPicker1) as NumberPicker
+
+        np.maxValue = 3
+        np.minValue = 0
+        np.wrapSelectorWheel = false
+        var titleText = ""
+
+        when (bar) {
+            progressBarWatering -> {
+                titleText = "Watering Frequency"
+                np.setDisplayedValues(arrayOf("Rarely", "Sometimes", "Often", "Very Often"))
+            }
+            progressBarSunlight -> {
+                titleText = "Sunlight Needed"
+                np.setDisplayedValues(arrayOf("Barely Any", "Some", "Moderate", "Alot"))
+            }
+            progressBarTemperature -> {
+                titleText = "Temperature"
+                np.setDisplayedValues(arrayOf("Resistant to cold", "Room temperature", "Above Room Temperature", "Tropical"))
+            }
+        }
+        title.text = titleText
+        b1.setOnClickListener {
+                bar.progress = (np.value + 1) * 25
+                d.dismiss()
+        }
+        b2.setOnClickListener{
+                d.dismiss()
+        }
+        d.show()
     }
 
     fun verifyStoragePermissions(activity: Activity?) {
