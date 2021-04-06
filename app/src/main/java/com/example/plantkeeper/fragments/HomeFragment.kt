@@ -1,6 +1,5 @@
 package com.example.plantkeeper.fragments
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plantkeeper.R
 import com.example.plantkeeper.adapters.PostAdapter
-import com.example.plantkeeper.models.Post
+import com.example.plantkeeper.models.Plant
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -22,7 +21,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [HomeFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class HomeFragment(val newPost: Post? = null) : Fragment() {
+class HomeFragment(val newPlant: Plant? = null) : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RecyclerView.Adapter<PostAdapter.ViewHolder>
 
@@ -46,10 +45,10 @@ class HomeFragment(val newPost: Post? = null) : Fragment() {
 
         val activity = activity!!
 
-        var list = ArrayList<Post>()
+        var list = ArrayList<Plant>()
         //var list = mutableListOf<Post>()
-        if (newPost != null) {
-            list.add(newPost)
+        if (newPlant != null) {
+            list.add(newPlant)
         }
 
 

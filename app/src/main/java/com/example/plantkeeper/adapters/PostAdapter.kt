@@ -6,15 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plantkeeper.R
-import com.example.plantkeeper.models.Post
+import com.example.plantkeeper.models.Plant
 
 class PostAdapter(
-    var posts: ArrayList<Post>,
+    var plants: ArrayList<Plant>,
     context: Context
     ) : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
 
@@ -48,8 +47,8 @@ class PostAdapter(
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             //holder.textViewHeader.text = position.toString()
-            holder.textViewHeader.text = posts[0].text
-            holder.image.setImageBitmap(posts[0].image)
+            holder.textViewHeader.text = plants[0].name
+            holder.image.setImageBitmap(plants[0].image)
             holder.image.scaleType = ImageView.ScaleType.CENTER_CROP;
             /*
             holder.textViewHeader.text = posts[position].text
@@ -63,8 +62,8 @@ class PostAdapter(
         override fun getItemCount(): Int {
             //var count = posts.size
             var count = 1
-            if (posts.size < 1) {
-                count = posts.size
+            if (plants.size < 1) {
+                count = plants.size
             } else {
                 count = 22
             }

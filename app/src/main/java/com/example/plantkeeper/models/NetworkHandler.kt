@@ -10,8 +10,10 @@ import androidx.annotation.RequiresApi
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -62,18 +64,11 @@ class NetworkHandler {
                     }
                 })
                 thread.start()
-
             }
-
-
-
-
-        println("ffff")
-
-
     }
 
-    fun newPost(post: Post, imgPath: String) {
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun newPlant(plant: Plant, imgPath: String) {
         val storage = FirebaseStorage.getInstance();
         val storageRef = storage.getReference();
 
@@ -91,12 +86,68 @@ class NetworkHandler {
         }.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val downloadUri = task.result
+                println(downloadUri.toString())
+                uploadNewPlantToDb(plant, downloadUri.toString())
                 println(downloadUri)
             } else {
 
             }
         }
 
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun uploadNewPlantToDb(plant: Plant, imageUrl: String) {
+        val auth = Firebase.auth
+
+        val user = auth.currentUser
+
+        val url = URL(postUrl + "/new/" + user.uid)
+
+        val jsonObject = JSONObject()
+
+        jsonObject.put("title", plant.name)
+        jsonObject.put("image", imageUrl)
+
+        val body = jsonObject.toString()
+
+        user.getIdToken(true)
+            .addOnSuccessListener { result ->
+                val idToken = result.token
+                val bearerToken = idToken
+
+                val thread = Thread(Runnable {
+                    try {
+                        val connection = url.openConnection()
+                        connection.setRequestProperty("Bearer", bearerToken)
+
+                        with(url.openConnection() as HttpURLConnection) {
+                            requestMethod = "POST"  // optional default is GET
+                            setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                            setRequestProperty("Authorization","Bearer "+ bearerToken)
+
+                            val outputWriter = OutputStreamWriter(outputStream)
+                            outputWriter.write(body)
+                            outputWriter.flush()
+
+                            println("\nSent 'GET' request to URL : $url; Response Code : $responseCode")
+
+                            inputStream.bufferedReader().use {
+                                it.lines().forEach { line ->
+                                    println('y')
+                                    println(line)
+                                }
+                            }
+                        }
+
+                    }
+                    catch (e:Exception) {
+                        println(e)
+
+                    }
+                })
+                thread.start()
+            }
     }
 
     fun getImageUri(inContext: Context, inImage: Bitmap): Uri? {

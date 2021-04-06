@@ -21,8 +21,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.example.plantkeeper.R
 import com.example.plantkeeper.models.NetworkHandler
-import com.example.plantkeeper.models.Post
-import kotlinx.android.synthetic.main.fragment_create.*
+import com.example.plantkeeper.models.Plant
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -79,10 +78,10 @@ class CreateFragment : Fragment() {
 
         saveButton.setOnClickListener {
             val text = rootView.findViewById<EditText>(R.id.postName).text.toString()
-            val newPost = Post(img, text)
+            val newPost = Plant(img, text)
             val handler = NetworkHandler()
 
-            handler.newPost(newPost, imgPath)
+            handler.newPlant(newPost, imgPath)
 
             val newFragment: Fragment = HomeFragment(newPost)
             val transaction: FragmentTransaction = fragmentManager!!.beginTransaction()
