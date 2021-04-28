@@ -1,15 +1,19 @@
 package com.example.plantkeeper.fragments
 
 import ProfilePostAdapter
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView.OnItemClickListener
 import android.widget.GridView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.example.plantkeeper.R
+import com.example.plantkeeper.activities.MainActivity
+import com.example.plantkeeper.activities.SpecificPostActivity
 import com.example.plantkeeper.models.NetworkHandler
 import com.example.plantkeeper.models.Plant
 import kotlin.concurrent.thread
@@ -46,6 +50,14 @@ class ProfileFragment : Fragment() {
         var rootView = inflater.inflate(R.layout.fragment_profile, container, false)
         gridView = rootView.findViewById(R.id.profileGrid)
         adapter = ProfilePostAdapter(context!!, plantList)
+
+        gridView.onItemClickListener =
+            OnItemClickListener { parent, view, position, id ->
+                var intent = Intent(context, SpecificPostActivity::class.java)
+                var plant = plantList[position]
+                intent.putExtra("plant", plant)
+                startActivity(intent)
+            }
 
 
         val handler = NetworkHandler()

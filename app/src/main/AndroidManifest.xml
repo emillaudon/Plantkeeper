@@ -23,6 +23,7 @@
         <activity
             android:name=".activities.SpecificPostActivity"
             android:label="@string/title_activity_specific_post"
+            android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".activities.MainActivity" />
         <activity android:name=".activities.LoginActivity">
