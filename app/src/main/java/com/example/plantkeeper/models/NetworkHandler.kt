@@ -10,6 +10,7 @@ import androidx.annotation.RequiresApi
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -22,11 +23,12 @@ class NetworkHandler {
     val postUrl = "https://us-central1-plantkeeper-44769.cloudfunctions.net/post"
 
     @RequiresApi(Build.VERSION_CODES.N)
-    fun get() {
-        val url = URL(postUrl + "/IR80C7GlspczdTtdhAWFKE9sSvp2")
+    fun getUserPosts(callback: (result: List<Plant>) -> Unit) {
         val auth = Firebase.auth
 
         val user = auth.currentUser
+
+        val url = URL(postUrl + "/" + user.uid)
 
         user.getIdToken(true)
             .addOnSuccessListener { result ->
@@ -50,9 +52,27 @@ class NetworkHandler {
                             println("\nSent 'GET' request to URL : $url; Response Code : $responseCode")
 
                             inputStream.bufferedReader().use {
+                                var plantsList = mutableListOf<Plant>()
                                 it.lines().forEach { line ->
-                                    println('y')
                                     println(line)
+                                    var array = JSONArray(line)
+                                    for (i in 0 until array.length()) {
+                                        val jsonObject = array.getJSONObject(i)
+                                        //Plant(val image: String, val name: String, var wateringFreq: Int, var temperature: Int, var sunlight: Int, var note: String) {
+                                        var imageString = jsonObject["imageUrl"] as String
+                                        imageString = imageString.replace("\\/", "/")
+
+                                        val plantFromJson = Plant(
+                                            imageString,
+                                            jsonObject["title"] as String,
+                                            jsonObject["watering"] as Int,
+                                            jsonObject["temperature"] as Int,
+                                            jsonObject["sunlight"] as Int,
+                                            jsonObject["note"] as String
+                                        )
+                                        plantsList.add(plantFromJson)
+                                    }
+                                    callback(plantsList)
                                 }
                             }
                         }
@@ -166,4 +186,5 @@ class NetworkHandler {
             Images.Media.insertImage(inContext.contentResolver, inImage, "Title", null)
         return Uri.parse(path)
     }
+
 }

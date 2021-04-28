@@ -1,6 +1,7 @@
 package com.example.plantkeeper.adapters
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plantkeeper.R
 import com.example.plantkeeper.models.Plant
+import java.net.URL
 
 class PostAdapter(
     var plants: ArrayList<Plant>,
@@ -48,7 +50,11 @@ class PostAdapter(
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             //holder.textViewHeader.text = position.toString()
             holder.textViewHeader.text = plants[0].name
-            holder.image.setImageBitmap(plants[0].image)
+
+            val url = URL(plants[0].image)
+
+            val bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream())
+            holder.image.setImageBitmap(bmp)
             holder.image.scaleType = ImageView.ScaleType.CENTER_CROP;
             /*
             holder.textViewHeader.text = posts[position].text

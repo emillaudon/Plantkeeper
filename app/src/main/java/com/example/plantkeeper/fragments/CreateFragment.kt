@@ -108,12 +108,12 @@ class CreateFragment : Fragment() {
             val temperature = temperatureBar.progress
             val sunlight = sunlightBar.progress
 
-            val newPost = Plant(img, text, watering, temperature, sunlight, noteEditText.text.toString())
+            val newPost = Plant(imgPath, text, watering, temperature, sunlight, noteEditText.text.toString())
             val handler = NetworkHandler()
 
             handler.newPlant(newPost, imgPath)
 
-            val newFragment: Fragment = HomeFragment(newPost)
+            val newFragment: Fragment = HomeFragment()
             val transaction: FragmentTransaction = fragmentManager!!.beginTransaction()
 
             transaction.replace(R.id.flFragment, newFragment)
