@@ -62,13 +62,21 @@ class NetworkHandler {
                                         var imageString = jsonObject["imageUrl"] as String
                                         imageString = imageString.replace("\\/", "/")
 
+                                        var height: Double = -10.0
+
+                                        if (jsonObject["height"] != null) {
+                                            height = jsonObject["height"] as Double
+                                        }
+
+
                                         val plantFromJson = Plant(
                                             imageString,
                                             jsonObject["title"] as String,
                                             jsonObject["watering"] as Int,
                                             jsonObject["temperature"] as Int,
                                             jsonObject["sunlight"] as Int,
-                                            jsonObject["note"] as String
+                                            jsonObject["note"] as String,
+                                            height
                                         )
                                         plantsList.add(plantFromJson)
                                     }
@@ -175,6 +183,7 @@ class NetworkHandler {
         jsonObject.put("temperature", plant.temperature)
         jsonObject.put("sunlight", plant.sunlight)
         jsonObject.put("note", plant.note)
+        jsonObject.put("height", plant.height)
 
         return jsonObject
     }
