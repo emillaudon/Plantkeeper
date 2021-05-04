@@ -15,6 +15,7 @@ import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStreamWriter
+import java.lang.Error
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -63,9 +64,13 @@ class NetworkHandler {
                                         imageString = imageString.replace("\\/", "/")
 
                                         var height: Double = -10.0
+                                        print("fffffffffff")
 
-                                        if (jsonObject["height"] != null) {
-                                            height = jsonObject["height"] as Double
+                                        try {
+                                            var intHeight = jsonObject["height"] as Int
+                                            height = intHeight.toDouble()
+                                        } catch (e: Error) {
+
                                         }
 
 

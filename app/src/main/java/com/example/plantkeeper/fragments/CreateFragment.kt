@@ -57,7 +57,11 @@ class CreateFragment : Fragment() {
     lateinit var sunlightBar: ProgressBar
     lateinit var temperatureBar: ProgressBar
 
+    lateinit var heightTextView: TextView
+
     lateinit var noteEditText: EditText
+
+    var height: Double = -10.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,6 +86,9 @@ class CreateFragment : Fragment() {
         sunlightBar = rootView.findViewById(R.id.progressBarSunlight)
         temperatureBar = rootView.findViewById(R.id.progressBarTemperature)
 
+        heightTextView = rootView.findViewById(R.id.heightText)
+        heightTextView.text = "- CM"
+
         val barList = listOf<ProgressBar>(wateringBar, sunlightBar, temperatureBar)
 
         barList.forEach {bar ->
@@ -99,6 +106,10 @@ class CreateFragment : Fragment() {
             startActivityForResult(i, RESULT_LOAD_IMAGE)
         }
 
+        heightTextView.setOnClickListener {
+            showDialogForHeight()
+        }
+
 
 
         saveButton.setOnClickListener {
@@ -108,13 +119,13 @@ class CreateFragment : Fragment() {
             val temperature = temperatureBar.progress
             val sunlight = sunlightBar.progress
 
-            val newPost = Plant(imgPath, text, watering, temperature, sunlight, noteEditText.text.toString())
+            val newPost = Plant(imgPath, text, watering, temperature, sunlight, noteEditText.text.toString(), height)
             val handler = NetworkHandler()
 
             handler.newPlant(newPost, imgPath)
 
             val newFragment: Fragment = HomeFragment()
-            val transaction: FragmentTransaction = fragmentManager!!.beginTransaction()
+            val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
 
             transaction.replace(R.id.flFragment, newFragment)
             transaction.addToBackStack(null)
@@ -151,7 +162,7 @@ class CreateFragment : Fragment() {
     }
 
     fun showDialogFor(bar: ProgressBar) {
-        val d = Dialog(context!!)
+        val d = Dialog(requireContext())
         d.setTitle("NumberPicker")
         d.setContentView(R.layout.dialog)
         val b1 = d.findViewById(R.id.button1) as Button
@@ -189,20 +200,51 @@ class CreateFragment : Fragment() {
         d.show()
     }
 
+    fun showDialogForHeight() {
+        val d = Dialog(requireContext())
+        d.setTitle("Height in MM")
+        var titleText = "Height in MM"
+        d.setContentView(R.layout.dialog)
+        val b1 = d.findViewById(R.id.button1) as Button
+        val b2 = d.findViewById(R.id.button2) as Button
+        val title = d.findViewById(R.id.dialogTitle) as TextView
+        val np = d.findViewById(R.id.numberPicker1) as NumberPicker
+        if (height > 0.0) {
+            np.value = (height * 10.0).toInt()
+        }
+        title.text = titleText
+
+        np.maxValue = 400
+        np.minValue = 0
+        np.wrapSelectorWheel = false
+
+        b1.setOnClickListener {
+            height = np.value.toDouble() / 10.0
+            heightTextView.text = "$height CM"
+            d.dismiss()
+        }
+        b2.setOnClickListener{
+            d.dismiss()
+        }
+        d.show()
+    }
+
     fun verifyStoragePermissions(activity: Activity?) {
         // Check if we have write permission
         val permission =
             ActivityCompat.checkSelfPermission(
-                activity!!,
+                requireActivity(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                activity,
-                PERMISSIONS_STORAGE,
-                REQUEST_EXTERNAL_STORAGE
-            )
+            if (activity != null) {
+                ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+                )
+            }
         }
     }
 

@@ -37,5 +37,9 @@ class SpecificPostActivity : AppCompatActivity() {
         var noteTextview = findViewById<TextView>(R.id.noteSpecific)
 
         noteTextview.text = plant.note
+
+        var heightText = findViewById<TextView>(R.id.heightSpecific)
+        var height = plant.height
+        heightText.text = "$height CM"
     }
 }
