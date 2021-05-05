@@ -1,5 +1,6 @@
 package com.example.plantkeeper.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -41,5 +42,12 @@ class SpecificPostActivity : AppCompatActivity() {
         var heightText = findViewById<TextView>(R.id.heightSpecific)
         var height = plant.height
         heightText.text = "$height CM"
+
+        var updateButton = findViewById<ImageView>(R.id.newUpdateButton)
+        updateButton.setOnClickListener {
+            var intent = Intent(this, UpdateActivity::class.java)
+            intent.putExtra("plant", plant)
+            startActivity(intent)
+        }
     }
 }

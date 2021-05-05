@@ -22,6 +22,7 @@ import androidx.fragment.app.FragmentTransaction
 import com.example.plantkeeper.R
 import com.example.plantkeeper.models.NetworkHandler
 import com.example.plantkeeper.models.Plant
+import com.example.plantkeeper.models.PlantUpdate
 import kotlinx.android.synthetic.main.fragment_create.*
 
 
@@ -80,7 +81,7 @@ class CreateFragment : Fragment() {
         saveButton = rootView.findViewById(R.id.savebutton)
         image = rootView.findViewById(R.id.imageChosen)
 
-        noteEditText = rootView.findViewById(R.id.note)
+        noteEditText = rootView.findViewById(R.id.noteUpdate)
 
         wateringBar = rootView.findViewById(R.id.progressBarWatering)
         sunlightBar = rootView.findViewById(R.id.progressBarSunlight)
@@ -119,7 +120,10 @@ class CreateFragment : Fragment() {
             val temperature = temperatureBar.progress
             val sunlight = sunlightBar.progress
 
-            val newPost = Plant(imgPath, text, watering, temperature, sunlight, noteEditText.text.toString(), height)
+            var listOfUpdates = mutableListOf<PlantUpdate>()
+            listOfUpdates.add(PlantUpdate(height, "placeHolder", "placeHolder", 100))
+
+            val newPost = Plant(imgPath, text, watering, temperature, sunlight, noteEditText.text.toString(), height, "placeHolder", listOfUpdates)
             val handler = NetworkHandler()
 
             handler.newPlant(newPost, imgPath)

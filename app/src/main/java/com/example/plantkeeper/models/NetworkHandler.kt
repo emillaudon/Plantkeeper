@@ -10,6 +10,7 @@ import androidx.annotation.RequiresApi
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.gson.JsonArray
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -73,6 +74,9 @@ class NetworkHandler {
 
                                         }
 
+                                        var plantUpdatesJson = jsonObject["updates"] as JSONArray
+                                        var plantUpdates = plantUpdatesFromJson(plantUpdatesJson)
+
 
                                         val plantFromJson = Plant(
                                             imageString,
@@ -81,9 +85,12 @@ class NetworkHandler {
                                             jsonObject["temperature"] as Int,
                                             jsonObject["sunlight"] as Int,
                                             jsonObject["note"] as String,
-                                            height
-                                        )
+                                            height,
+                                            jsonObject["id"] as String,
+                                            plantUpdates)
+
                                         plantsList.add(plantFromJson)
+                                        print("done")
                                     }
                                     callback(plantsList)
                                 }
@@ -98,6 +105,21 @@ class NetworkHandler {
                 })
                 thread.start()
             }
+    }
+
+    fun plantUpdatesFromJson(jsonArray: JSONArray) : List<PlantUpdate> {
+        print("1111")
+        var listOfPlantUpdates = mutableListOf<PlantUpdate>()
+        for (i in 0 until jsonArray.length()) {
+            print("22222")
+            var currentJsonUpdate = jsonArray.getJSONObject(i)
+            var imageString = currentJsonUpdate["imageUrl"] as String
+            imageString = imageString.replace("\\/", "/")
+            var update = PlantUpdate(currentJsonUpdate["height"] as Double, imageString, currentJsonUpdate["note"] as String, currentJsonUpdate["time"] as Int)
+            listOfPlantUpdates.add(update)
+        }
+        print("33333")
+        return listOfPlantUpdates
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -121,6 +143,36 @@ class NetworkHandler {
                 val downloadUri = task.result
                 println(downloadUri.toString())
                 uploadNewPlantToDb(plant, downloadUri.toString())
+                println(downloadUri)
+            } else {
+
+            }
+        }
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun newUpdate(imgPath: String, plant: Plant, plantUpdate: PlantUpdate) {
+        val storage = FirebaseStorage.getInstance();
+        val storageRef = storage.getReference();
+
+        var file = Uri.fromFile(File(imgPath))
+        val ref = storageRef.child("images/${file.lastPathSegment}")
+        val uploadTask = ref.putFile(file)
+
+        val urlTask = uploadTask.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
+                }
+            }
+            ref.downloadUrl
+        }.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val downloadUri = task.result
+                plantUpdate.image = downloadUri.toString()
+                println(downloadUri.toString())
+                uploadUpdateToDb(plant, plantUpdate)
                 println(downloadUri)
             } else {
 
@@ -179,8 +231,61 @@ class NetworkHandler {
             }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun uploadUpdateToDb(plant: Plant, update: PlantUpdate) {
+        val auth = Firebase.auth
+
+        val user = auth.currentUser
+
+        val url = URL(postUrl + "/newUpdate/" + user.uid)
+
+        val jsonUpdate = createJsonUpdate(plant.plantId, update)
+        val body = jsonUpdate.toString()
+
+        user.getIdToken(true)
+            .addOnSuccessListener { result ->
+                val idToken = result.token
+                val bearerToken = idToken
+
+                val thread = Thread(Runnable {
+                    try {
+                        val connection = url.openConnection()
+                        connection.setRequestProperty("Bearer", bearerToken)
+
+                        with(url.openConnection() as HttpURLConnection) {
+                            requestMethod = "PUT"  // optional default is GET
+                            setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                            setRequestProperty("Authorization","Bearer "+ bearerToken)
+
+                            val outputWriter = OutputStreamWriter(outputStream)
+                            outputWriter.write(body)
+                            outputWriter.flush()
+
+                            println("\nSent 'GET' request to URL : $url; Response Code : $responseCode")
+
+                            inputStream.bufferedReader().use {
+                                it.lines().forEach { line ->
+                                    println('y')
+                                    println(line)
+                                }
+                            }
+                        }
+
+                    }
+                    catch (e:Exception) {
+                        println(e)
+
+                    }
+                })
+                thread.start()
+            }
+    }
+
     private fun createJsonPlant(plant: Plant, imageUrl: String): JSONObject {
         val jsonObject = JSONObject()
+
+        val currentTime = System.currentTimeMillis() / 1000;
+        print(currentTime)
 
         jsonObject.put("title", plant.name)
         jsonObject.put("image", imageUrl)
@@ -189,6 +294,22 @@ class NetworkHandler {
         jsonObject.put("sunlight", plant.sunlight)
         jsonObject.put("note", plant.note)
         jsonObject.put("height", plant.height)
+        jsonObject.put("time",  currentTime)
+
+        return jsonObject
+    }
+
+    private fun createJsonUpdate(plantId: String, update: PlantUpdate): JSONObject {
+        val jsonObject = JSONObject()
+
+        val currentTime = System.currentTimeMillis() / 1000;
+        print(currentTime)
+
+        jsonObject.put("plantId", plantId)
+        jsonObject.put("imageUrl", update.image)
+        jsonObject.put("note", update.note)
+        jsonObject.put("height", update.height)
+        jsonObject.put("time",  currentTime)
 
         return jsonObject
     }
