@@ -47,9 +47,9 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        println("now1")
         var rootView = inflater.inflate(R.layout.fragment_profile, container, false)
         gridView = rootView.findViewById(R.id.profileGrid)
-        adapter = ProfilePostAdapter(context!!, plantList)
 
         gridView.onItemClickListener =
             OnItemClickListener { parent, view, position, id ->
@@ -62,15 +62,13 @@ class ProfileFragment : Fragment() {
 
         val handler = NetworkHandler()
         thread {
+            println("getting")
             handler.getUserPosts {
-                println(it)
-                println("ok")
-                println("telling")
-                println(plantList.count())
-                plantList = it.toTypedArray()
-                //adapter.notifyDataSetChanged()
-                update()
 
+                if (it.count() > plantList.count()) {
+                    plantList = it.toTypedArray()
+                    update()
+                }
             }
         }.run()
 
@@ -90,6 +88,7 @@ class ProfileFragment : Fragment() {
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             ProfileFragment().apply {
+                println("now2")
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)
@@ -99,12 +98,16 @@ class ProfileFragment : Fragment() {
 
     private fun update() {
         activity!!.runOnUiThread {
+            gridView.adapter = ProfilePostAdapter(requireContext(), plantList)
+            /*
             adapter.notifyDataSetChanged()
             adapter.notifyDataSetInvalidated()
             gridView.adapter = adapter
             adapter.notifyDataSetChanged()
             adapter.notifyDataSetInvalidated()
             gridView.invalidateViews()
+
+             */
         }
     }
 }

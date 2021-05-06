@@ -70,6 +70,7 @@ class SpecificPostActivity : AppCompatActivity() {
                 ////Use object
                 if (data != null) {
                     val result = data.getSerializableExtra("result") as PlantUpdate
+                    plant.height = result.height
                     plant.plantUpdates = plant.plantUpdates + result
 
                     println(plant.plantUpdates.count())

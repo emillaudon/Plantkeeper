@@ -135,7 +135,7 @@ class UpdateActivity : AppCompatActivity() {
 
         title.text = titleText
 
-        oldHeight = 15.1
+        //oldHeight = plant.height
         np.maxValue = 400
         np.minValue = (oldHeight * 10).toInt()
         np.wrapSelectorWheel = false
