@@ -80,14 +80,26 @@ class UpdateActivity : AppCompatActivity() {
             var newHeight = plant.height
             var note = noteEditText.text.toString()
             val currentTime = System.currentTimeMillis() / 1000
-            networkHandler.newUpdate(imgPath, plant, PlantUpdate(plant.height, "placeHolder", note, currentTime.toInt() ))
-            this.finish()
+            networkHandler.newUpdate(imgPath, plant, PlantUpdate(plant.height, "placeHolder", note, currentTime.toInt() )) { imageUrl ->
+                print(imageUrl)
+                var intent = Intent()
+                var result = PlantUpdate(plant.height, imageUrl, note, currentTime.toInt())
+                intent.putExtra("result", result)
+
+                //onActivityResult(1,1,intent)
+                setResult(Activity.RESULT_OK, intent)
+
+                this.finish()
+            }
         }
 
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (data != null) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (data != null ) {
+            print("ffffff2")
+            print(resultCode)
             val selectedImage: Uri? = data.data
             val filePathColumn =
                 arrayOf(MediaStore.Images.Media.DATA)
@@ -108,7 +120,7 @@ class UpdateActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Try Again!!", Toast.LENGTH_SHORT).show()
         }
-        super.onActivityResult(requestCode, resultCode, data)
+
     }
 
     fun showDialogForHeight() {

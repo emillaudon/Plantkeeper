@@ -152,7 +152,7 @@ class NetworkHandler {
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
-    fun newUpdate(imgPath: String, plant: Plant, plantUpdate: PlantUpdate) {
+    fun newUpdate(imgPath: String, plant: Plant, plantUpdate: PlantUpdate, callback: (result: String) -> Unit) {
         val storage = FirebaseStorage.getInstance();
         val storageRef = storage.getReference();
 
@@ -174,6 +174,8 @@ class NetworkHandler {
                 println(downloadUri.toString())
                 uploadUpdateToDb(plant, plantUpdate)
                 println(downloadUri)
+
+                callback(plantUpdate.image)
             } else {
 
             }

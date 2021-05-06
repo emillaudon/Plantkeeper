@@ -114,7 +114,7 @@ class CreateFragment : Fragment() {
 
 
         saveButton.setOnClickListener {
-            val text = rootView.findViewById<EditText>(R.id.postName).text.toString()
+            val text = rootView.findViewById<EditText>(R.id.updateNote).text.toString()
 
             val watering = wateringBar.progress
             val temperature = temperatureBar.progress

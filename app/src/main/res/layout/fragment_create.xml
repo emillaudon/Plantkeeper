@@ -68,7 +68,7 @@
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
             <EditText
-                android:id="@+id/postName"
+                android:id="@+id/updateNote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
