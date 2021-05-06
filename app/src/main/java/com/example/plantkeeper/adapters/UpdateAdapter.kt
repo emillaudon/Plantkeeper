@@ -56,7 +56,7 @@ class UpdateAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         Picasso.get().load(updates[position].image).into(holder.image);
-        holder.heightTextView.text = "${ (updates[position].height * 10).toInt() } CM"
+        holder.heightTextView.text = "${ (updates[position].height) } CM"
         holder.note.text = updates[position].note
 
     }

@@ -51,6 +51,10 @@ class ProfileFragment : Fragment() {
         var rootView = inflater.inflate(R.layout.fragment_profile, container, false)
         gridView = rootView.findViewById(R.id.profileGrid)
 
+        if(plantList.count() > 0) {
+            gridView.adapter = ProfilePostAdapter(requireContext(), plantList)
+        }
+
         gridView.onItemClickListener =
             OnItemClickListener { parent, view, position, id ->
                 var intent = Intent(context, SpecificPostActivity::class.java)
@@ -64,11 +68,15 @@ class ProfileFragment : Fragment() {
         thread {
             println("getting")
             handler.getUserPosts {
-
+                println("done")
+                println(it.count())
+                println(plantList.count())
                 if (it.count() > plantList.count()) {
                     plantList = it.toTypedArray()
+                    print("updating")
                     update()
                 }
+
             }
         }.run()
 

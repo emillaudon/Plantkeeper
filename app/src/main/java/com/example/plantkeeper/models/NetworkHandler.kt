@@ -69,10 +69,13 @@ class NetworkHandler {
 
                                         try {
                                             var intHeight = jsonObject["height"] as Int
-                                            height = intHeight.toDouble()
+                                            println("1234")
+                                            height = intHeight.toDouble() / 10
+                                            println("12345")
                                         } catch (e: Error) {
 
                                         }
+                                        println("12345")
 
                                         var plantUpdatesJson = jsonObject["updates"] as JSONArray
                                         var plantUpdates = plantUpdatesFromJson(plantUpdatesJson)
@@ -111,11 +114,15 @@ class NetworkHandler {
         print("1111")
         var listOfPlantUpdates = mutableListOf<PlantUpdate>()
         for (i in 0 until jsonArray.length()) {
-            print("22222")
+
             var currentJsonUpdate = jsonArray.getJSONObject(i)
             var imageString = currentJsonUpdate["imageUrl"] as String
             imageString = imageString.replace("\\/", "/")
-            var update = PlantUpdate(currentJsonUpdate["height"] as Double, imageString, currentJsonUpdate["note"] as String, currentJsonUpdate["time"] as Int)
+            var intHeight = currentJsonUpdate["height"] as Int
+            var heightOfUpdate = intHeight.toDouble() / 10
+
+            var update = PlantUpdate(heightOfUpdate, imageString, currentJsonUpdate["note"] as String, currentJsonUpdate["time"] as Int)
+
             listOfPlantUpdates.add(update)
         }
         print("33333")
@@ -289,13 +296,15 @@ class NetworkHandler {
         val currentTime = System.currentTimeMillis() / 1000;
         print(currentTime)
 
+        var heightAsInt = (plant.height * 10).toInt()
+
         jsonObject.put("title", plant.name)
         jsonObject.put("image", imageUrl)
         jsonObject.put("watering", plant.wateringFreq)
         jsonObject.put("temperature", plant.temperature)
         jsonObject.put("sunlight", plant.sunlight)
         jsonObject.put("note", plant.note)
-        jsonObject.put("height", plant.height)
+        jsonObject.put("height", heightAsInt)
         jsonObject.put("time",  currentTime)
 
         return jsonObject
@@ -307,10 +316,12 @@ class NetworkHandler {
         val currentTime = System.currentTimeMillis() / 1000;
         print(currentTime)
 
+        var heightAsInt = (update.height * 10).toInt()
+
         jsonObject.put("plantId", plantId)
         jsonObject.put("imageUrl", update.image)
         jsonObject.put("note", update.note)
-        jsonObject.put("height", update.height)
+        jsonObject.put("height", heightAsInt)
         jsonObject.put("time",  currentTime)
 
         return jsonObject
