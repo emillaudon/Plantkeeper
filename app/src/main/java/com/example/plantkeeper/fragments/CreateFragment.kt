@@ -123,7 +123,7 @@ class CreateFragment : Fragment() {
             var listOfUpdates = mutableListOf<PlantUpdate>()
             listOfUpdates.add(PlantUpdate(height, "placeHolder", "placeHolder", 100))
 
-            val newPost = Plant(imgPath, text, watering, temperature, sunlight, noteEditText.text.toString(), height, "placeHolder", listOfUpdates)
+            val newPost = Plant(imgPath, text, watering, temperature, sunlight, noteEditText.text.toString(), height, "placeHolder", listOfUpdates, 1)
             val handler = NetworkHandler()
 
             handler.newPlant(newPost, imgPath)

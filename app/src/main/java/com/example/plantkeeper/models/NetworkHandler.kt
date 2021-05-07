@@ -6,17 +6,14 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore.Images
 import androidx.annotation.RequiresApi
-
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.google.gson.JsonArray
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStreamWriter
-import java.lang.Error
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -90,7 +87,8 @@ class NetworkHandler {
                                             jsonObject["note"] as String,
                                             height,
                                             jsonObject["id"] as String,
-                                            plantUpdates)
+                                            plantUpdates,
+                                            jsonObject["creationTime"] as Int)
 
                                         plantsList.add(plantFromJson)
                                         print("done")
@@ -248,7 +246,7 @@ class NetworkHandler {
 
         val url = URL(postUrl + "/newUpdate/" + user.uid)
 
-        val jsonUpdate = createJsonUpdate(plant.plantId, update)
+        val jsonUpdate = createJsonUpdate(plant.plantId, update, plant.creationTime)
         val body = jsonUpdate.toString()
 
         user.getIdToken(true)
@@ -296,6 +294,8 @@ class NetworkHandler {
         val currentTime = System.currentTimeMillis() / 1000;
         print(currentTime)
 
+
+
         var heightAsInt = (plant.height * 10).toInt()
 
         jsonObject.put("title", plant.name)
@@ -310,10 +310,12 @@ class NetworkHandler {
         return jsonObject
     }
 
-    private fun createJsonUpdate(plantId: String, update: PlantUpdate): JSONObject {
+    private fun createJsonUpdate(plantId: String, update: PlantUpdate, plantCreationTime: Int): JSONObject {
         val jsonObject = JSONObject()
 
         val currentTime = System.currentTimeMillis() / 1000;
+
+        var daysBetweenUpdateAndCreation = getDateDifference(plantCreationTime.toLong(), currentTime.toLong())
         print(currentTime)
 
         var heightAsInt = (update.height * 10).toInt()
@@ -322,7 +324,7 @@ class NetworkHandler {
         jsonObject.put("imageUrl", update.image)
         jsonObject.put("note", update.note)
         jsonObject.put("height", heightAsInt)
-        jsonObject.put("time",  currentTime)
+        jsonObject.put("time",  daysBetweenUpdateAndCreation)
 
         return jsonObject
     }
@@ -333,6 +335,18 @@ class NetworkHandler {
         val path =
             Images.Media.insertImage(inContext.contentResolver, inImage, "Title", null)
         return Uri.parse(path)
+    }
+
+    fun getDateDifference(startDate: Long, endDate: Long): Int {
+
+        //milliseconds
+        val different = (endDate * 1000) - (startDate * 1000)
+        val secondsInMilli: Long = 1000
+        val minutesInMilli = secondsInMilli * 60
+        val hoursInMilli = minutesInMilli * 60
+        val daysInMilli = hoursInMilli * 24
+        val elapsedDays = different / daysInMilli
+        return elapsedDays.toInt()
     }
 
 }

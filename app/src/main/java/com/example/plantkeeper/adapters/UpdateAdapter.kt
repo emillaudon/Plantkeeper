@@ -44,6 +44,8 @@ class UpdateAdapter(
 
         var note = itemView.findViewById<TextView>(R.id.updateNoteSpec)
 
+        var ageTextView = itemView.findViewById<TextView>(R.id.ageText)
+
     }
 
 
@@ -58,6 +60,7 @@ class UpdateAdapter(
         Picasso.get().load(updates[position].image).into(holder.image);
         holder.heightTextView.text = "${ (updates[position].height) } CM"
         holder.note.text = updates[position].note
+        holder.ageTextView.text = updates[position].time.toString() + " days old"
 
     }
     override fun getItemCount(): Int {
