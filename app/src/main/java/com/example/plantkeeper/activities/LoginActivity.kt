@@ -3,10 +3,12 @@ package com.example.plantkeeper.activities
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import com.example.plantkeeper.R
+import com.example.plantkeeper.models.NetworkHandler
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -24,10 +26,19 @@ class LoginActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_login)
 
-        var button = findViewById<Button>(R.id.button);
+        var loginButton = findViewById<Button>(R.id.button);
 
-        button.setOnClickListener {
-            login("testmail@email.test", "password");
+        loginButton.setOnClickListener {
+            login("testmail2@email.test", "testtest23");
+        }
+
+        var registerButton = findViewById<Button>(R.id.registerButton)
+
+        registerButton.setOnClickListener {
+            var emailField = findViewById<EditText>(R.id.emailEditText)
+            var passwordField = findViewById<EditText>(R.id.passwordEditText)
+            auth.createUserWithEmailAndPassword(emailField.text.toString(), passwordField.text.toString())
+            startActivity(Intent(this, NewUserActivity::class.java))
         }
     }
 
@@ -43,6 +54,12 @@ class LoginActivity : AppCompatActivity() {
                             val idToken = result.token
                             //Do whatever
                             println("GetTokenResult result = $idToken")
+
+
+                            ///TODO: Put name into user object
+
+                            ///TODO: Save to database
+
                             startActivity(Intent(this, MainActivity::class.java))
                 }
 

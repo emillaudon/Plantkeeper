@@ -20,11 +20,54 @@ import java.net.URL
 
 class NetworkHandler {
     val postUrl = "https://us-central1-plantkeeper-44769.cloudfunctions.net/post"
+    val userUrl = "https://us-central1-plantkeeper-44769.cloudfunctions.net/user"
+
+    fun saveUserName(userName: String, callback: () -> Unit) {
+        val auth = Firebase.auth
+        val user = auth.currentUser
+
+        val url = URL(userUrl + "/userName/" + user.uid)
+
+        val jsonObject = JSONObject()
+        jsonObject.put("userName", userName)
+        var body = jsonObject.toString()
+
+        user.getIdToken(true)
+            .addOnSuccessListener { result ->
+                val idToken = result.token
+                val bearerToken = idToken
+
+                val thread = Thread(Runnable {
+                    try {
+                        val connection = url.openConnection()
+                        connection.setRequestProperty("Bearer", bearerToken)
+
+                        with(url.openConnection() as HttpURLConnection) {
+                            requestMethod = "POST"  // optional default is GET
+                            setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                            setRequestProperty("Authorization","Bearer "+ bearerToken)
+
+                            val outputWriter = OutputStreamWriter(outputStream)
+                            outputWriter.write(body)
+                            outputWriter.flush()
+                            callback()
+                        }
+
+                    }
+                    catch (e:Exception) {
+                        println(e)
+
+                    }
+                })
+                thread.start()
+            }
+
+
+    }
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun getUserPosts(callback: (result: List<Plant>) -> Unit) {
         val auth = Firebase.auth
-
         val user = auth.currentUser
 
         val url = URL(postUrl + "/" + user.uid)

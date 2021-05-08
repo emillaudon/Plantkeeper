@@ -20,7 +20,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activities.UpdateActivity"></activity>
+        <activity android:name=".activities.NewUserActivity"></activity>
+        <activity android:name=".activities.UpdateActivity" />
         <activity
             android:name=".activities.SpecificPostActivity"
             android:label="@string/title_activity_specific_post"
