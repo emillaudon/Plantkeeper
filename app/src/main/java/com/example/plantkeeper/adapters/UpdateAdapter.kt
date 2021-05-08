@@ -1,7 +1,6 @@
 package com.example.plantkeeper.adapters
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
@@ -11,11 +10,8 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plantkeeper.R
-import com.example.plantkeeper.models.Plant
 import com.example.plantkeeper.models.PlantUpdate
 import com.squareup.picasso.Picasso
-import org.w3c.dom.Text
-import java.net.URL
 
 class UpdateAdapter(
     context: Context,
@@ -42,7 +38,7 @@ class UpdateAdapter(
 
         var heightTextView = itemView.findViewById<TextView>(R.id.heightSpecific)
 
-        var note = itemView.findViewById<TextView>(R.id.updateNoteSpec)
+        var note = itemView.findViewById<TextView>(R.id.textView)
 
         var ageTextView = itemView.findViewById<TextView>(R.id.ageText)
 
