@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plantkeeper.R
@@ -56,6 +58,18 @@ class HomeFragment(val newPlant: Plant? = null) : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(activity)
+
+        var yesButton = rootView.findViewById<Button>(R.id.addFriendButton)
+
+        yesButton.setOnClickListener {
+            val newFragment: Fragment = AddFriendFragment()
+            val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
+
+            transaction.replace(R.id.flFragment, newFragment)
+            transaction.addToBackStack(null)
+
+            transaction.commit()
+        }
 
         // Inflate the layout for this fragment
         return rootView
