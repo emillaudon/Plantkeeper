@@ -3,6 +3,7 @@ package com.example.plantkeeper.activities
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -25,9 +26,18 @@ class SpecificPostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_specific_post)
         plant = intent.getSerializableExtra("plant") as Plant
-        setSupportActionBar(findViewById(R.id.toolbar))
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        supportActionBar!!.title = plant.name
+       // setSupportActionBar(findViewById(R.id.toolbar))
+       // supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        //supportActionBar!!.title = plant.name
+
+        var title = findViewById<TextView>(R.id.plantNameText)
+        title.text = plant.name
+
+        var backButton = findViewById<Button>(R.id.backButton)
+
+        backButton.setOnClickListener {
+            finish()
+        }
 
         recyclerView = findViewById<RecyclerView>(R.id.updatesRecyclerView)
 
