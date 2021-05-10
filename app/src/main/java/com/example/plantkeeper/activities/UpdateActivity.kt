@@ -3,8 +3,10 @@ package com.example.plantkeeper.activities
 import android.Manifest
 import android.app.Activity
 import android.app.Dialog
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -25,6 +27,7 @@ class UpdateActivity : AppCompatActivity() {
     lateinit var image: ImageView
 
     private val REQUEST_EXTERNAL_STORAGE = 1
+    val REQUEST_IMAGE_CAPTURE = 1
     private val PERMISSIONS_STORAGE = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -67,10 +70,7 @@ class UpdateActivity : AppCompatActivity() {
 
         image.setOnClickListener {
             verifyStoragePermissions(this)
-            val i = Intent(
-                Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            )
-            startActivityForResult(i, RESULT_LOAD_IMAGE)
+            dispatchTakePictureIntent()
         }
 
         updateButton.setOnClickListener {
@@ -95,9 +95,34 @@ class UpdateActivity : AppCompatActivity() {
 
     }
 
+    private fun dispatchTakePictureIntent() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        try {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        } catch (e: ActivityNotFoundException) {
+            // display error state to the user
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (data != null ) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && data != null) {
+
+            val projection =
+                arrayOf(MediaStore.Images.Media.DATA)
+            val cursor: Cursor = managedQuery(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null
+            )
+            val column_index_data: Int = cursor
+                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            cursor.moveToLast()
+
+            imgPath = cursor.getString(column_index_data)
+            val bitmapImage = BitmapFactory.decodeFile(imgPath)
+            image.setImageBitmap(bitmapImage)
+            image.scaleType = ImageView.ScaleType.CENTER_CROP
+        } else if (data != null ) {
             print("ffffff2")
             print(resultCode)
             val selectedImage: Uri? = data.data
