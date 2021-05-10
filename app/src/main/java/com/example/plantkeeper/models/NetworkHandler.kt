@@ -28,8 +28,11 @@ class NetworkHandler {
 
         val url = URL(userUrl + "/userName/" + user.uid)
 
+        var userEmail = user.email
+
         val jsonObject = JSONObject()
         jsonObject.put("userName", userName)
+        jsonObject.put("email", userEmail)
         var body = jsonObject.toString()
 
         user.getIdToken(true)
@@ -51,6 +54,10 @@ class NetworkHandler {
                             outputWriter.write(body)
                             outputWriter.flush()
                             callback()
+
+                            inputStream.bufferedReader().use {
+
+                            }
                         }
 
                     }
@@ -90,6 +97,8 @@ class NetworkHandler {
                         with(url.openConnection() as HttpURLConnection) {
                             requestMethod = "GET"  // optional default is GET
                             setRequestProperty("Authorization","Bearer "+ bearerToken)
+                            println(bearerToken)
+                            println("111")
 
                             println("\nSent 'GET' request to URL : $url; Response Code : $responseCode")
 
