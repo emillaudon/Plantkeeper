@@ -12,10 +12,12 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plantkeeper.R
 import com.example.plantkeeper.models.Plant
+import com.example.plantkeeper.models.PlantUpdate
+import com.squareup.picasso.Picasso
 import java.net.URL
 
 class PostAdapter(
-    var plants: ArrayList<Plant>,
+    var updates: ArrayList<PlantUpdate>,
     context: Context
     ) : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
 
@@ -49,12 +51,10 @@ class PostAdapter(
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             //holder.textViewHeader.text = position.toString()
-            holder.textViewHeader.text = plants[0].name
 
-            val url = URL(plants[0].image)
+            holder.textViewHeader.text = updates[position].note
 
-            val bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream())
-            holder.image.setImageBitmap(bmp)
+            Picasso.get().load(updates[position].image).into(holder.image);
             holder.image.scaleType = ImageView.ScaleType.CENTER_CROP;
             /*
             holder.textViewHeader.text = posts[position].text
@@ -67,13 +67,7 @@ class PostAdapter(
         }
         override fun getItemCount(): Int {
             //var count = posts.size
-            var count = 1
-            if (plants.size < 1) {
-                count = plants.size
-            } else {
-                count = 22
-            }
-            return count
+            return updates.count()
         }
 
     }

@@ -1,17 +1,23 @@
 package com.example.plantkeeper.fragments
 
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
+import androidx.annotation.RequiresApi
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plantkeeper.R
 import com.example.plantkeeper.adapters.PostAdapter
+import com.example.plantkeeper.models.NetworkHandler
 import com.example.plantkeeper.models.Plant
+import com.example.plantkeeper.models.PlantUpdate
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -27,6 +33,7 @@ class HomeFragment(val newPlant: Plant? = null) : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RecyclerView.Adapter<PostAdapter.ViewHolder>
 
+    lateinit var list: ArrayList<PlantUpdate>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +44,7 @@ class HomeFragment(val newPlant: Plant? = null) : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -45,31 +53,50 @@ class HomeFragment(val newPlant: Plant? = null) : Fragment() {
 
         recyclerView = rootView.findViewById(R.id.recyclerView)
 
-        val activity = activity!!
+        val activity = requireActivity()
 
-        var list = ArrayList<Plant>()
-        //var list = mutableListOf<Post>()
-        if (newPlant != null) {
-            list.add(newPlant)
-        }
-
-
+        list = ArrayList<PlantUpdate>()
         adapter = PostAdapter(list, activity)
         recyclerView.adapter = adapter
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(activity)
 
         var yesButton = rootView.findViewById<Button>(R.id.addFriendButton)
+        var addFriendText = rootView.findViewById<TextView>(R.id.noFriendsTextView)
 
-        yesButton.setOnClickListener {
-            val newFragment: Fragment = AddFriendFragment()
-            val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
+        var networkHandler = NetworkHandler()
+        networkHandler.getFriendPosts() {
+            if (it.count() > 0) {
+                list = ArrayList(it)
 
-            transaction.replace(R.id.flFragment, newFragment)
-            transaction.addToBackStack(null)
+                requireActivity().runOnUiThread {
+                    addFriendText.isVisible = false
+                    yesButton.isVisible = false
+                }
 
-            transaction.commit()
+                update()
+            } else {
+
+
+
+                yesButton.setOnClickListener {
+                    val newFragment: Fragment = AddFriendFragment()
+                    val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
+
+                    transaction.replace(R.id.flFragment, newFragment)
+                    transaction.addToBackStack(null)
+
+                    transaction.commit()
+                }
+            }
+
+
+
+
+
         }
+
+
 
         // Inflate the layout for this fragment
         return rootView
@@ -93,5 +120,20 @@ class HomeFragment(val newPlant: Plant? = null) : Fragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    private fun update() {
+        requireActivity().runOnUiThread {
+            recyclerView.adapter = PostAdapter(list, requireActivity())
+            /*
+            adapter.notifyDataSetChanged()
+            adapter.notifyDataSetInvalidated()
+            gridView.adapter = adapter
+            adapter.notifyDataSetChanged()
+            adapter.notifyDataSetInvalidated()
+            gridView.invalidateViews()
+
+             */
+        }
     }
 }

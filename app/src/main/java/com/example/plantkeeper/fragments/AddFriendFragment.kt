@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import androidx.fragment.app.FragmentTransaction
 import com.example.plantkeeper.R
+import com.example.plantkeeper.models.NetworkHandler
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -39,20 +41,29 @@ class AddFriendFragment : Fragment() {
         // Inflate the layout for this fragment
         val rootView = inflater.inflate(R.layout.fragment_add_friend, container, false)
 
+        var addButton = rootView.findViewById<Button>(R.id.addFriendButton2)
+
+        addButton.setOnClickListener {
+            var emailEditText = rootView.findViewById<EditText>(R.id.emailFriendEditText)
+            var emailToAdd = emailEditText.text.toString()
+
+            var networkHandler = NetworkHandler()
+            networkHandler.addFriend(emailToAdd) {
+                val newFragment: Fragment = HomeFragment()
+                val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
+
+                transaction.replace(R.id.flFragment, newFragment)
+                transaction.addToBackStack(null)
+
+                transaction.commit()
+            }
+        }
+
 
         return rootView
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment AddFriendFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             AddFriendFragment().apply {

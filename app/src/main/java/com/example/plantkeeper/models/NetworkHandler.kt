@@ -22,6 +22,123 @@ class NetworkHandler {
     val postUrl = "https://us-central1-plantkeeper-44769.cloudfunctions.net/post"
     val userUrl = "https://us-central1-plantkeeper-44769.cloudfunctions.net/user"
 
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun getFriendPosts(callback: (List<PlantUpdate>) -> Unit) {
+        var updatesList = listOf<PlantUpdate>()
+
+        val auth = Firebase.auth
+        val user = auth.currentUser
+
+        val url = URL(postUrl + "/friendPosts/" + user.uid)
+
+        user.getIdToken(true)
+            .addOnSuccessListener { result ->
+                val idToken = result.token
+                //Do whatever
+                println("GetTokenResult result = $idToken")
+                println("kkkk")
+
+                val bearerToken = idToken
+
+                val thread = Thread(Runnable {
+                    try {
+
+                        val connection = url.openConnection()
+                        connection.setRequestProperty("Bearer", bearerToken)
+
+                        with(url.openConnection() as HttpURLConnection) {
+                            requestMethod = "GET"  // optional default is GET
+                            setRequestProperty("Authorization","Bearer "+ bearerToken)
+                            println(bearerToken)
+                            println("111")
+
+                            println("\nSent 'GET' request to URL : $url; Response Code : $responseCode")
+
+                            inputStream.bufferedReader().use {
+
+                                it.lines().forEach { users ->
+                                    var usersArray = JSONArray(users)
+
+                                    for (i in 0 until usersArray.length()) {
+                                        var user = usersArray[i] as JSONObject
+
+                                        var plants = user["plants"] as JSONArray
+                                        var plantsArray = plants
+                                        //Plant(val image: String, val name: String, var wateringFreq: Int, var temperature: Int, var sunlight: Int, var note: String) {
+                                        for (i in 0 until plantsArray.length()) {
+                                            println("03")
+                                            var plantObject = plantsArray.getJSONObject(i)
+                                            println(plantObject)
+                                            var updates = plantObject["updates"] as JSONArray
+
+                                            var plantUpdates = plantUpdatesFromJson(updates)
+
+                                            updatesList = updatesList + plantUpdates
+
+                                        }
+                                    }
+                                }
+
+                            }
+                            println(updatesList)
+                            callback(updatesList)
+                        }
+
+                    }
+                    catch (e:Exception) {
+                        println(e)
+
+                    }
+                })
+                thread.start()
+            }
+    }
+
+    fun addFriend(email: String, callback: () -> Unit) {
+        val auth = Firebase.auth
+        val user = auth.currentUser
+
+        val url = URL(userUrl + "/addFriend/" + user.uid)
+
+        val jsonObject = JSONObject()
+        jsonObject.put("email", email)
+        var body = jsonObject.toString()
+
+        user.getIdToken(true)
+            .addOnSuccessListener { result ->
+                val idToken = result.token
+                val bearerToken = idToken
+
+                val thread = Thread(Runnable {
+                    try {
+                        val connection = url.openConnection()
+                        connection.setRequestProperty("Bearer", bearerToken)
+
+                        with(url.openConnection() as HttpURLConnection) {
+                            requestMethod = "POST"  // optional default is GET
+                            setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                            setRequestProperty("Authorization","Bearer "+ bearerToken)
+
+                            val outputWriter = OutputStreamWriter(outputStream)
+                            outputWriter.write(body)
+                            outputWriter.flush()
+                            callback()
+
+                            inputStream.bufferedReader().use {
+
+                            }
+                        }
+
+                    }
+                    catch (e:Exception) {
+                        println(e)
+
+                    }
+                })
+                thread.start()
+            }
+    }
+
     fun saveUserName(userName: String, callback: () -> Unit) {
         val auth = Firebase.auth
         val user = auth.currentUser
