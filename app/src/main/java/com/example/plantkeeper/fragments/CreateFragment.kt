@@ -130,7 +130,7 @@ class CreateFragment : Fragment() {
             val sunlight = sunlightBar.progress
 
             var listOfUpdates = mutableListOf<PlantUpdate>()
-            listOfUpdates.add(PlantUpdate(height, "placeHolder", "placeHolder", 100))
+            listOfUpdates.add(PlantUpdate(height, "placeHolder", "placeHolder", "100", 1))
 
             imgPath = currentPhotoPath
 

@@ -288,7 +288,7 @@ class NetworkHandler {
             var intHeight = currentJsonUpdate["height"] as Int
             var heightOfUpdate = intHeight.toDouble() / 10
 
-            var update = PlantUpdate(heightOfUpdate, imageString, currentJsonUpdate["note"] as String, currentJsonUpdate["time"] as Int)
+            var update = PlantUpdate(heightOfUpdate, imageString, currentJsonUpdate["note"] as String, currentJsonUpdate["daysOld"] as String, currentJsonUpdate["time"] as Int)
 
             listOfPlantUpdates.add(update)
         }
@@ -493,7 +493,8 @@ class NetworkHandler {
         jsonObject.put("imageUrl", update.image)
         jsonObject.put("note", update.note)
         jsonObject.put("height", heightAsInt)
-        jsonObject.put("time",  daysBetweenUpdateAndCreation)
+        jsonObject.put("daysOld", update.daysOld)
+        jsonObject.put("time",  update.timeCreated)
 
         return jsonObject
     }

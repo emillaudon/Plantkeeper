@@ -29,6 +29,7 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class UpdateActivity : AppCompatActivity() {
 
@@ -87,11 +88,21 @@ class UpdateActivity : AppCompatActivity() {
             var networkHandler = NetworkHandler()
             var newHeight = plant.height
             var note = noteEditText.text.toString()
-            val currentTime = System.currentTimeMillis() / 1000
-            networkHandler.newUpdate(currentPhotoPath, plant, PlantUpdate(plant.height, "placeHolder", note, currentTime.toInt() )) { imageUrl ->
+
+            val currentTime = System.currentTimeMillis()
+
+            val millionSeconds = (plant.creationTime.toLong() * 1000) - currentTime
+            var daysSinceCreation = TimeUnit.MILLISECONDS.toDays(millionSeconds).toString()
+            if (daysSinceCreation.contains("-")) {
+                daysSinceCreation = daysSinceCreation.split("-")[1]
+            }
+
+            var timeCreated = (currentTime / 1000).toInt()
+
+            networkHandler.newUpdate(currentPhotoPath, plant, PlantUpdate(plant.height, "placeHolder", note, daysSinceCreation, timeCreated )) { imageUrl ->
                 print(imageUrl)
                 var intent = Intent()
-                var result = PlantUpdate(plant.height, imageUrl, note, currentTime.toInt())
+                var result = PlantUpdate(plant.height, imageUrl, note, daysSinceCreation, timeCreated)
                 intent.putExtra("result", result)
 
                 //onActivityResult(1,1,intent)

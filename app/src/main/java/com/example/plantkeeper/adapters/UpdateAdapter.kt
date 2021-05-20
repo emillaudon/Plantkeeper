@@ -56,7 +56,7 @@ class UpdateAdapter(
         Picasso.get().load(updates[position].image).into(holder.image);
         holder.heightTextView.text = "${ (updates[position].height) } CM"
         holder.note.text = updates[position].note
-        holder.ageTextView.text = updates[position].time.toString() + " days old"
+        holder.ageTextView.text = updates[position].daysOld + " days old"
 
     }
     override fun getItemCount(): Int {
