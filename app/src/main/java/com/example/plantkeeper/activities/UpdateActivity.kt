@@ -13,14 +13,22 @@ import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import com.example.plantkeeper.BuildConfig
 import com.example.plantkeeper.R
 import com.example.plantkeeper.models.NetworkHandler
 import com.example.plantkeeper.models.Plant
 import com.example.plantkeeper.models.PlantUpdate
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class UpdateActivity : AppCompatActivity() {
 
@@ -36,7 +44,7 @@ class UpdateActivity : AppCompatActivity() {
     private var RESULT_LOAD_IMAGE: Int = 1
 
     lateinit var img: Bitmap
-    lateinit var imgPath: String
+    lateinit var currentPhotoPath: String
 
     lateinit var heightTextView: TextView
 
@@ -70,7 +78,7 @@ class UpdateActivity : AppCompatActivity() {
 
         image.setOnClickListener {
             verifyStoragePermissions(this)
-            dispatchTakePictureIntent()
+            askCameraPermissions()
         }
 
         updateButton.setOnClickListener {
@@ -80,7 +88,7 @@ class UpdateActivity : AppCompatActivity() {
             var newHeight = plant.height
             var note = noteEditText.text.toString()
             val currentTime = System.currentTimeMillis() / 1000
-            networkHandler.newUpdate(imgPath, plant, PlantUpdate(plant.height, "placeHolder", note, currentTime.toInt() )) { imageUrl ->
+            networkHandler.newUpdate(currentPhotoPath, plant, PlantUpdate(plant.height, "placeHolder", note, currentTime.toInt() )) { imageUrl ->
                 print(imageUrl)
                 var intent = Intent()
                 var result = PlantUpdate(plant.height, imageUrl, note, currentTime.toInt())
@@ -95,33 +103,72 @@ class UpdateActivity : AppCompatActivity() {
 
     }
 
+    private fun createImageFile(): File? {
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageFileName = "JPEG_" + timeStamp + "_"
+
+        val storageDir: File =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val image: File = File.createTempFile(
+            imageFileName,
+            ".jpg",
+            storageDir
+        )
+
+        currentPhotoPath = image.getAbsolutePath()
+        return image
+    }
+
     private fun dispatchTakePictureIntent() {
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        var photoFile: File? = null
         try {
+            photoFile = createImageFile()
+        } catch (ex: IOException) {
+        }
+        // Continue only if the File was successfully created
+        if (photoFile != null) {
+            val photoURI: Uri = FileProvider.getUriForFile(
+                this,
+                BuildConfig.APPLICATION_ID +".fileprovider",
+                photoFile
+            )
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-        } catch (e: ActivityNotFoundException) {
-            // display error state to the user
+        }
+
+    }
+
+    private fun askCameraPermissions() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) !== PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                101
+            )
+        } else {
+            dispatchTakePictureIntent()
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_IMAGE_CAPTURE && data != null) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            val f = File(currentPhotoPath)
 
-            val projection =
-                arrayOf(MediaStore.Images.Media.DATA)
-            val cursor: Cursor = managedQuery(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projection, null, null, null
-            )
-            val column_index_data: Int = cursor
-                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            cursor.moveToLast()
-
-            imgPath = cursor.getString(column_index_data)
-            val bitmapImage = BitmapFactory.decodeFile(imgPath)
-            image.setImageBitmap(bitmapImage)
+            image.setImageURI(Uri.fromFile(f))
+            println("4")
             image.scaleType = ImageView.ScaleType.CENTER_CROP
+
+            val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+            val contentUri = Uri.fromFile(f)
+            mediaScanIntent.data = contentUri
+            this.sendBroadcast(mediaScanIntent)
         } else if (data != null ) {
             print("ffffff2")
             print(resultCode)
@@ -137,7 +184,7 @@ class UpdateActivity : AppCompatActivity() {
             val columnIndex = cursor?.getColumnIndex(filePathColumn[0])
             val picturePath = cursor?.getString(columnIndex!!)
             cursor?.close()
-            imgPath = picturePath!!
+
             img = BitmapFactory.decodeFile(picturePath)
             image.setImageBitmap(img)
             image.scaleType = ImageView.ScaleType.CENTER_CROP;
