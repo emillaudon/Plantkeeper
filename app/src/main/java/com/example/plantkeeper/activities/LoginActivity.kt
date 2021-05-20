@@ -16,30 +16,51 @@ import kotlin.concurrent.thread
 
 
 class LoginActivity : AppCompatActivity() {
-    lateinit var auth : FirebaseAuth;
+    lateinit var auth : FirebaseAuth
+
+    lateinit var emailField: EditText
+    lateinit var passwordField: EditText
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        auth = Firebase.auth;
+        auth = Firebase.auth
 
         setContentView(R.layout.activity_login)
 
-        var loginButton = findViewById<Button>(R.id.button);
+        var loginButton = findViewById<Button>(R.id.button)
+        emailField = findViewById<EditText>(R.id.emailEditText)
+        passwordField = findViewById<EditText>(R.id.passwordEditText)
 
-        loginButton.setOnClickListener {
-            login("testmail2@email.test", "testtest23");
-        }
+
 
         var registerButton = findViewById<Button>(R.id.registerButton)
 
         registerButton.setOnClickListener {
-            var emailField = findViewById<EditText>(R.id.emailEditText)
-            var passwordField = findViewById<EditText>(R.id.passwordEditText)
-            auth.createUserWithEmailAndPassword(emailField.text.toString(), passwordField.text.toString())
-            startActivity(Intent(this, NewUserActivity::class.java))
+            var email = emailField.text.toString()
+            var password = passwordField.text.toString()
+            if (credentialsFilledOut()) {
+                auth.createUserWithEmailAndPassword(email, password)
+                startActivity(Intent(this, NewUserActivity::class.java))
+            } else {
+                Toast.makeText(this, "Make sure that both fields are filled out.", Toast.LENGTH_SHORT).show()
+            }
         }
+
+        loginButton.setOnClickListener {
+            var email = emailField.text.toString()
+            var password = passwordField.text.toString()
+            if (credentialsFilledOut()) {
+                login(email, password)
+            } else {
+                Toast.makeText(this, "Make sure that both fields are filled out.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    fun credentialsFilledOut() : Boolean {
+        return emailField.text.toString() != "" && passwordField.text.toString() != ""
     }
 
     fun login(email: String, password: String) {
@@ -47,7 +68,7 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    println("signInWithEmail:success");
+                    println("signInWithEmail:success")
                     val user = auth.currentUser
                     user.getIdToken(true)
                         .addOnSuccessListener { result ->
