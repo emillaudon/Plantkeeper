@@ -3,10 +3,8 @@ package com.example.plantkeeper.activities
 import android.Manifest
 import android.app.Activity
 import android.app.Dialog
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -27,7 +25,6 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class UpdateActivity : AppCompatActivity() {
 
@@ -195,8 +192,8 @@ class UpdateActivity : AppCompatActivity() {
         d.setTitle("Height in MM")
         var titleText = "Height in MM"
         d.setContentView(R.layout.dialog)
-        val b1 = d.findViewById(R.id.button1) as Button
-        val b2 = d.findViewById(R.id.button2) as Button
+        val setButton = d.findViewById(R.id.setButton) as Button
+        val cancelButton = d.findViewById(R.id.cancelButton) as Button
         val title = d.findViewById(R.id.dialogTitle) as TextView
         val np = d.findViewById(R.id.numberPicker1) as NumberPicker
 
@@ -206,26 +203,24 @@ class UpdateActivity : AppCompatActivity() {
         np.minValue = (oldHeight * 10).toInt()
         np.wrapSelectorWheel = false
 
-        b1.setOnClickListener {
+        setButton.setOnClickListener {
             plant.height = np.value.toDouble() / 10.0
             heightTextView.text = "${plant.height} CM"
             d.dismiss()
         }
-        b2.setOnClickListener{
+        cancelButton.setOnClickListener{
             d.dismiss()
         }
         d.show()
     }
 
     fun verifyStoragePermissions(activity: Activity?) {
-        // Check if we have write permission
         val permission =
             ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
             if (activity != null) {
                 ActivityCompat.requestPermissions(
                     activity,

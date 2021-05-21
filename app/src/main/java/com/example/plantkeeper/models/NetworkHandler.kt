@@ -47,7 +47,6 @@ class NetworkHandler {
 
                                 it.lines().forEach { users ->
                                     val usersArray = JSONArray(users)
-
                                     for (i in 0 until usersArray.length()) {
                                         val user = usersArray[i] as JSONObject
 
@@ -201,11 +200,9 @@ class NetworkHandler {
             }
     }
 
-
         @RequiresApi(Build.VERSION_CODES.N)
     fun getUserPosts(callback: (result: List<Plant>) -> Unit) {
         val url = URL(postUrl + "/" + user.uid)
-
         user.getIdToken(true)
             .addOnSuccessListener { result ->
                 val idToken = result.token
@@ -254,42 +251,6 @@ class NetworkHandler {
                 })
                 thread.start()
             }
-    }
-
-    private fun plantFromJson(
-        imageString: String,
-        jsonObject: JSONObject,
-        height: Double,
-        plantUpdates: List<PlantUpdate>
-    ): Plant {
-        return Plant(
-            imageString,
-            jsonObject["title"] as String,
-            jsonObject["watering"] as Int,
-            jsonObject["temperature"] as Int,
-            jsonObject["sunlight"] as Int,
-            jsonObject["note"] as String,
-            height,
-            jsonObject["id"] as String,
-            plantUpdates,
-            jsonObject["creationTime"] as Int)
-    }
-
-    fun plantUpdatesFromJson(jsonArray: JSONArray, userName: String) : List<PlantUpdate> {
-        var listOfPlantUpdates = mutableListOf<PlantUpdate>()
-        for (i in 0 until jsonArray.length()) {
-
-            var currentJsonUpdate = jsonArray.getJSONObject(i)
-            var imageString = currentJsonUpdate["imageUrl"] as String
-            imageString = imageString.replace("\\/", "/")
-            var intHeight = currentJsonUpdate["height"] as Int
-            var heightOfUpdate = intHeight.toDouble() / 10
-
-            var update = PlantUpdate(heightOfUpdate, imageString, currentJsonUpdate["note"] as String, currentJsonUpdate["daysOld"] as String, currentJsonUpdate["time"] as Int, userName)
-
-            listOfPlantUpdates.add(update)
-        }
-        return listOfPlantUpdates
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -430,6 +391,42 @@ class NetworkHandler {
                 })
                 thread.start()
             }
+    }
+
+    private fun plantFromJson(
+        imageString: String,
+        jsonObject: JSONObject,
+        height: Double,
+        plantUpdates: List<PlantUpdate>
+    ): Plant {
+        return Plant(
+            imageString,
+            jsonObject["title"] as String,
+            jsonObject["watering"] as Int,
+            jsonObject["temperature"] as Int,
+            jsonObject["sunlight"] as Int,
+            jsonObject["note"] as String,
+            height,
+            jsonObject["id"] as String,
+            plantUpdates,
+            jsonObject["creationTime"] as Int)
+    }
+
+    fun plantUpdatesFromJson(jsonArray: JSONArray, userName: String) : List<PlantUpdate> {
+        var listOfPlantUpdates = mutableListOf<PlantUpdate>()
+        for (i in 0 until jsonArray.length()) {
+
+            var currentJsonUpdate = jsonArray.getJSONObject(i)
+            var imageString = currentJsonUpdate["imageUrl"] as String
+            imageString = imageString.replace("\\/", "/")
+            var intHeight = currentJsonUpdate["height"] as Int
+            var heightOfUpdate = intHeight.toDouble() / 10
+
+            var update = PlantUpdate(heightOfUpdate, imageString, currentJsonUpdate["note"] as String, currentJsonUpdate["daysOld"] as String, currentJsonUpdate["time"] as Int, userName)
+
+            listOfPlantUpdates.add(update)
+        }
+        return listOfPlantUpdates
     }
 
     private fun createJsonPlant(plant: Plant, imageUrl: String): JSONObject {

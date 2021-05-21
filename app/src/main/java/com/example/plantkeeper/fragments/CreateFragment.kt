@@ -12,7 +12,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.text.Layout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -245,8 +244,8 @@ class CreateFragment : Fragment() {
         val d = Dialog(requireContext())
         d.setTitle("NumberPicker")
         d.setContentView(R.layout.dialog)
-        val b1 = d.findViewById(R.id.button1) as Button
-        val b2 = d.findViewById(R.id.button2) as Button
+        val setButton = d.findViewById(R.id.setButton) as Button
+        val cancelButton = d.findViewById(R.id.cancelButton) as Button
         val title = d.findViewById(R.id.dialogTitle) as TextView
         val np = d.findViewById(R.id.numberPicker1) as NumberPicker
 
@@ -270,11 +269,11 @@ class CreateFragment : Fragment() {
             }
         }
         title.text = titleText
-        b1.setOnClickListener {
+        setButton.setOnClickListener {
                 bar.progress = (np.value + 1) * 25
                 d.dismiss()
         }
-        b2.setOnClickListener{
+        cancelButton.setOnClickListener{
                 d.dismiss()
         }
         d.show()
@@ -285,8 +284,8 @@ class CreateFragment : Fragment() {
         d.setTitle("Height in MM")
         var titleText = "Height in MM"
         d.setContentView(R.layout.dialog)
-        val b1 = d.findViewById(R.id.button1) as Button
-        val b2 = d.findViewById(R.id.button2) as Button
+        val b1 = d.findViewById(R.id.setButton) as Button
+        val b2 = d.findViewById(R.id.cancelButton) as Button
         val title = d.findViewById(R.id.dialogTitle) as TextView
         val np = d.findViewById(R.id.numberPicker1) as NumberPicker
         if (height > 0.0) {
