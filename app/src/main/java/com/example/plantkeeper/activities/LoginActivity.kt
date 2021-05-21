@@ -25,7 +25,6 @@ class LoginActivity : AppCompatActivity() {
 
     lateinit var sharedPref: SharedPreferences
 
-
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,29 +43,12 @@ class LoginActivity : AppCompatActivity() {
         var registerButton = findViewById<Button>(R.id.registerButton)
 
         registerButton.setOnClickListener {
-            var email = emailField.text.toString()
-            var password = passwordField.text.toString()
-            if (credentialsFilledOut()) {
-                auth.createUserWithEmailAndPassword(email, password)
-                startActivity(Intent(this, NewUserActivity::class.java))
-            } else {
-                Toast.makeText(this, "Make sure that both fields are filled out.", Toast.LENGTH_SHORT).show()
-            }
+            loginButtonClicked()
         }
 
         loginButton.setOnClickListener {
-            var email = emailField.text.toString()
-            var password = passwordField.text.toString()
-            if (credentialsFilledOut()) {
-                login(email, password)
-            } else {
-                Toast.makeText(this, "Make sure that both fields are filled out.", Toast.LENGTH_SHORT).show()
-            }
+            registerButtonClicked()
         }
-    }
-
-    fun credentialsFilledOut() : Boolean {
-        return emailField.text.toString() != "" && passwordField.text.toString() != ""
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -78,7 +60,6 @@ class LoginActivity : AppCompatActivity() {
                     val user = auth.currentUser
                     user.getIdToken(true)
                         .addOnSuccessListener { result ->
-                            val idToken = result.token
                             sharedPref.edit().putString("userEmail", emailField.text.toString()).apply()
 
                             User(false) {
@@ -92,5 +73,31 @@ class LoginActivity : AppCompatActivity() {
 
             }
 
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun registerButtonClicked() {
+        var email = emailField.text.toString()
+        var password = passwordField.text.toString()
+        if (credentialsFilledOut()) {
+            login(email, password)
+        } else {
+            Toast.makeText(this, "Make sure that both fields are filled out.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun loginButtonClicked() {
+        var email = emailField.text.toString()
+        var password = passwordField.text.toString()
+        if (credentialsFilledOut()) {
+            auth.createUserWithEmailAndPassword(email, password)
+            startActivity(Intent(this, NewUserActivity::class.java))
+        } else {
+            Toast.makeText(this, "Make sure that both fields are filled out.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun credentialsFilledOut() : Boolean {
+        return emailField.text.toString() != "" && passwordField.text.toString() != ""
     }
 }
