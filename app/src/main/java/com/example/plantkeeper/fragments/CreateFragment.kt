@@ -27,6 +27,7 @@ import com.example.plantkeeper.R
 import com.example.plantkeeper.models.NetworkHandler
 import com.example.plantkeeper.models.Plant
 import com.example.plantkeeper.models.PlantUpdate
+import com.example.plantkeeper.models.User
 import kotlinx.android.synthetic.main.fragment_create.*
 import java.io.File
 import java.io.IOException
@@ -130,7 +131,7 @@ class CreateFragment : Fragment() {
             val sunlight = sunlightBar.progress
 
             var listOfUpdates = mutableListOf<PlantUpdate>()
-            listOfUpdates.add(PlantUpdate(height, "placeHolder", "placeHolder", "100", 1))
+            listOfUpdates.add(PlantUpdate(height, "placeHolder", "placeHolder", "100", 1, User.name))
 
             imgPath = currentPhotoPath
 

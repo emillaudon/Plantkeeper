@@ -25,6 +25,7 @@ import com.example.plantkeeper.R
 import com.example.plantkeeper.models.NetworkHandler
 import com.example.plantkeeper.models.Plant
 import com.example.plantkeeper.models.PlantUpdate
+import com.example.plantkeeper.models.User
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -99,10 +100,10 @@ class UpdateActivity : AppCompatActivity() {
 
             var timeCreated = (currentTime / 1000).toInt()
 
-            networkHandler.newUpdate(currentPhotoPath, plant, PlantUpdate(plant.height, "placeHolder", note, daysSinceCreation, timeCreated )) { imageUrl ->
+            networkHandler.newUpdate(currentPhotoPath, plant, PlantUpdate(plant.height, "placeHolder", note, daysSinceCreation, timeCreated, User.name)) { imageUrl ->
                 print(imageUrl)
                 var intent = Intent()
-                var result = PlantUpdate(plant.height, imageUrl, note, daysSinceCreation, timeCreated)
+                var result = PlantUpdate(plant.height, imageUrl, note, daysSinceCreation, timeCreated, User.name)
                 intent.putExtra("result", result)
 
                 //onActivityResult(1,1,intent)

@@ -61,6 +61,7 @@ class NetworkHandler {
 
                                     for (i in 0 until usersArray.length()) {
                                         var user = usersArray[i] as JSONObject
+                                        println(user)
 
                                         var plants = user["plants"] as JSONArray
                                         var plantsArray = plants
@@ -71,7 +72,7 @@ class NetworkHandler {
                                             println(plantObject)
                                             var updates = plantObject["updates"] as JSONArray
 
-                                            var plantUpdates = plantUpdatesFromJson(updates)
+                                            var plantUpdates = plantUpdatesFromJson(updates, user["userName"] as String)
 
                                             updatesList = updatesList + plantUpdates
 
@@ -285,7 +286,7 @@ class NetworkHandler {
                                         println("12345")
 
                                         var plantUpdatesJson = jsonObject["updates"] as JSONArray
-                                        var plantUpdates = plantUpdatesFromJson(plantUpdatesJson)
+                                        var plantUpdates = plantUpdatesFromJson(plantUpdatesJson, User.name)
 
 
                                         val plantFromJson = Plant(
@@ -318,7 +319,7 @@ class NetworkHandler {
             }
     }
 
-    fun plantUpdatesFromJson(jsonArray: JSONArray) : List<PlantUpdate> {
+    fun plantUpdatesFromJson(jsonArray: JSONArray, userName: String) : List<PlantUpdate> {
         var listOfPlantUpdates = mutableListOf<PlantUpdate>()
         for (i in 0 until jsonArray.length()) {
 
@@ -328,7 +329,7 @@ class NetworkHandler {
             var intHeight = currentJsonUpdate["height"] as Int
             var heightOfUpdate = intHeight.toDouble() / 10
 
-            var update = PlantUpdate(heightOfUpdate, imageString, currentJsonUpdate["note"] as String, currentJsonUpdate["daysOld"] as String, currentJsonUpdate["time"] as Int)
+            var update = PlantUpdate(heightOfUpdate, imageString, currentJsonUpdate["note"] as String, currentJsonUpdate["daysOld"] as String, currentJsonUpdate["time"] as Int, userName)
 
             listOfPlantUpdates.add(update)
         }

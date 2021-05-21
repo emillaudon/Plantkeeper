@@ -37,6 +37,7 @@ class PostAdapter(
         class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             var textViewHeader: TextView = itemView.findViewById(R.id.updateText)
             var image: ImageView = itemView.findViewById(R.id.plantImage)
+            var userNameTextView: TextView = itemView.findViewById(R.id.friendName)
 
 
         }
@@ -50,17 +51,11 @@ class PostAdapter(
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            //holder.textViewHeader.text = position.toString()
-
             holder.textViewHeader.text = updates[position].note
 
             Picasso.get().load(updates[position].image).into(holder.image);
             holder.image.scaleType = ImageView.ScaleType.CENTER_CROP;
-            /*
-            holder.textViewHeader.text = posts[position].text
-            holder.image.setImageBitmap(posts[position].image)
-            holder.image.scaleType = ImageView.ScaleType.CENTER_CROP;
-             */
+            holder.userNameTextView.text = updates[position].creatorName + ": "
 
 
 
