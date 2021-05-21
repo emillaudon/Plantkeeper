@@ -1,14 +1,18 @@
 package com.example.plantkeeper.activities
 
 import android.content.Intent
+import android.media.Image
 import android.os.Build
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import com.example.plantkeeper.R
+import com.example.plantkeeper.fragments.AddFriendFragment
 import com.example.plantkeeper.fragments.CreateFragment
 import com.example.plantkeeper.fragments.HomeFragment
 import com.example.plantkeeper.fragments.ProfileFragment
@@ -33,6 +37,12 @@ class MainActivity : AppCompatActivity() {
         var userNameTextView = findViewById<TextView>(R.id.userNameTextView)
         var userName = User.name
         userNameTextView.text = userName
+
+        var addFriendsImageView = findViewById<ImageView>(R.id.addFriendsButton)
+        addFriendsImageView.setOnClickListener {
+            val newFragment: Fragment = AddFriendFragment()
+            setCurrentFragment(newFragment)
+        }
 
 
         bottomNavigationView.setOnNavigationItemSelectedListener {
