@@ -278,7 +278,6 @@ class NetworkHandler {
     }
 
     fun plantUpdatesFromJson(jsonArray: JSONArray) : List<PlantUpdate> {
-        print("1111")
         var listOfPlantUpdates = mutableListOf<PlantUpdate>()
         for (i in 0 until jsonArray.length()) {
 
@@ -292,7 +291,6 @@ class NetworkHandler {
 
             listOfPlantUpdates.add(update)
         }
-        print("33333")
         return listOfPlantUpdates
     }
 

@@ -16,6 +16,8 @@ import com.example.plantkeeper.activities.MainActivity
 import com.example.plantkeeper.activities.SpecificPostActivity
 import com.example.plantkeeper.models.NetworkHandler
 import com.example.plantkeeper.models.Plant
+import com.example.plantkeeper.models.PlantSorter
+import com.example.plantkeeper.models.PlantSorter.Companion.bubbleSort
 import kotlin.concurrent.thread
 
 
@@ -73,6 +75,7 @@ class ProfileFragment : Fragment() {
                 println(plantList.count())
                 if (it.count() > plantList.count()) {
                     plantList = it.toTypedArray()
+                    plantList = plantList.bubbleSort()
                     print("updating")
                     update()
                 }
