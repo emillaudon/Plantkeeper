@@ -22,8 +22,6 @@ class ProfilePostAdapter(
 
 
     override fun getCount(): Int {
-        println("in")
-        println(plants.count().toString() + "fff")
         return plants.count()
     }
 
@@ -37,7 +35,6 @@ class ProfilePostAdapter(
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         var convertView = convertView
-        println("getvi")
         if (layourInflater == null) {
             layourInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         }
@@ -49,11 +46,6 @@ class ProfilePostAdapter(
         textview.text = plants[position].name
 
         Picasso.get().load(plants[position].image).into(imageView);
-
-        //val url = URL(plants[position].image)
-        //val bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream())
-        //imageView.setImageBitmap(bmp)
-
 
         return convertView
     }
