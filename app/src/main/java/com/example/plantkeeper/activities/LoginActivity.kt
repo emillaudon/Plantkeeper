@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.plantkeeper.R
-import com.example.plantkeeper.models.NetworkHandler
 import com.example.plantkeeper.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -27,15 +26,13 @@ class LoginActivity : AppCompatActivity() {
     lateinit var sharedPref: SharedPreferences
 
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_login)
 
         sharedPref = getSharedPreferences("userMail", Context.MODE_PRIVATE)
-
-
         auth = Firebase.auth
-
-        setContentView(R.layout.activity_login)
 
         var loginButton = findViewById<Button>(R.id.button)
         emailField = findViewById<EditText>(R.id.emailEditText)
@@ -43,8 +40,6 @@ class LoginActivity : AppCompatActivity() {
 
         //Check sharedPreferences for cached email, set emailfield to it if exists, else set it to empty.
         emailField.setText((sharedPref.getString("userEmail", "")))
-
-
 
         var registerButton = findViewById<Button>(R.id.registerButton)
 
@@ -80,33 +75,21 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    println("signInWithEmail:success")
                     val user = auth.currentUser
                     user.getIdToken(true)
                         .addOnSuccessListener { result ->
                             val idToken = result.token
-                            //Do whatever
-                            println("GetTokenResult result = $idToken")
-
                             sharedPref.edit().putString("userEmail", emailField.text.toString()).apply()
 
-                            var n = NetworkHandler()
-                            n.getUserData {userData ->
-                                User(userData)
+                            User(false) {
                                 startActivity(Intent(this, MainActivity::class.java))
                             }
-                }
-
+                        }
                 } else {
-                    // If sign in fails, display a message to the user.
-                    println("signInWithEmail:failure")
                     Toast.makeText(baseContext, "Authentication failed.",
                         Toast.LENGTH_SHORT).show()
-                            //updateUI(null)
-                    // ...
                 }
 
-                // ...
             }
 
     }

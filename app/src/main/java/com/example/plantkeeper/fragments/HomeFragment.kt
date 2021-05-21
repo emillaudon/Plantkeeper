@@ -73,7 +73,7 @@ class HomeFragment(val newPlant: Plant? = null) : Fragment() {
 
             var networkHandler = NetworkHandler()
             networkHandler.getFriendPosts() {
-                if (it.count() > 0) {
+                if (it.count() > 0 && list != ArrayList(it)) {
                     list = ArrayList(it)
 
                     update()
