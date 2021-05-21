@@ -22,10 +22,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.example.plantkeeper.BuildConfig
 import com.example.plantkeeper.R
-import com.example.plantkeeper.models.NetworkHandler
-import com.example.plantkeeper.models.Plant
-import com.example.plantkeeper.models.PlantUpdate
-import com.example.plantkeeper.models.User
+import com.example.plantkeeper.models.*
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -43,8 +40,6 @@ class UpdateActivity : AppCompatActivity() {
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
-    private var RESULT_LOAD_IMAGE: Int = 1
-
     lateinit var img: Bitmap
     lateinit var currentPhotoPath: String
 
@@ -54,14 +49,12 @@ class UpdateActivity : AppCompatActivity() {
 
     lateinit var plant: Plant
 
-
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_update)
 
         plant = intent.getSerializableExtra("plant") as Plant
-
         oldHeight = plant.height
 
         var name = findViewById<TextView>(R.id.namePlantUpdatge)
@@ -84,35 +77,26 @@ class UpdateActivity : AppCompatActivity() {
         }
 
         updateButton.setOnClickListener {
-            var noteEditText = findViewById<EditText>(R.id.noteUpdate)
-
-            var networkHandler = NetworkHandler()
-            var newHeight = plant.height
-            var note = noteEditText.text.toString()
-
-            val currentTime = System.currentTimeMillis()
-
-            val millionSeconds = (plant.creationTime.toLong() * 1000) - currentTime
-            var daysSinceCreation = TimeUnit.MILLISECONDS.toDays(millionSeconds).toString()
-            if (daysSinceCreation.contains("-")) {
-                daysSinceCreation = daysSinceCreation.split("-")[1]
-            }
-
-            var timeCreated = (currentTime / 1000).toInt()
-
-            networkHandler.newUpdate(currentPhotoPath, plant, PlantUpdate(plant.height, "placeHolder", note, daysSinceCreation, timeCreated, User.name)) { imageUrl ->
-                print(imageUrl)
-                var intent = Intent()
-                var result = PlantUpdate(plant.height, imageUrl, note, daysSinceCreation, timeCreated, User.name)
-                intent.putExtra("result", result)
-
-                //onActivityResult(1,1,intent)
-                setResult(Activity.RESULT_OK, intent)
-
-                this.finish()
-            }
+            finishUpdate()
         }
 
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun finishUpdate() {
+        var noteEditText = findViewById<EditText>(R.id.noteUpdate)
+        var note = noteEditText.text.toString()
+        var updateHandler = UpdateHandler()
+
+        updateHandler.newUpdate(plant, currentPhotoPath, note) {newUpdate ->
+
+            var intent = Intent()
+            intent.putExtra("result", newUpdate)
+
+            setResult(Activity.RESULT_OK, intent)
+
+            this.finish()
+        }
     }
 
     private fun createImageFile(): File? {
@@ -174,7 +158,6 @@ class UpdateActivity : AppCompatActivity() {
             val f = File(currentPhotoPath)
 
             image.setImageURI(Uri.fromFile(f))
-            println("4")
             image.scaleType = ImageView.ScaleType.CENTER_CROP
 
             val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
@@ -219,7 +202,6 @@ class UpdateActivity : AppCompatActivity() {
 
         title.text = titleText
 
-        //oldHeight = plant.height
         np.maxValue = 400
         np.minValue = (oldHeight * 10).toInt()
         np.wrapSelectorWheel = false

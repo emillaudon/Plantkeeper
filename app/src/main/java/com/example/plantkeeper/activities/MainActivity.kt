@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity() {
             setCurrentFragment(newFragment)
         }
 
-
         bottomNavigationView.setOnNavigationItemSelectedListener {
             when(it.itemId){
                 R.id.home->setCurrentFragment(homeFragment)
@@ -75,7 +74,6 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun replaceFragments(fragmentClass: Class<*>) {
-
         var fragment: Fragment? = null
         try {
             fragment = fragmentClass.newInstance() as Fragment

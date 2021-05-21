@@ -25,27 +25,20 @@ class SpecificPostActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_specific_post)
+
         plant = intent.getSerializableExtra("plant") as Plant
-       // setSupportActionBar(findViewById(R.id.toolbar))
-       // supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        //supportActionBar!!.title = plant.name
 
         var title = findViewById<TextView>(R.id.plantNameText)
         title.text = plant.name
 
         var backButton = findViewById<Button>(R.id.backButton)
-
         backButton.setOnClickListener {
             finish()
         }
 
         recyclerView = findViewById<RecyclerView>(R.id.updatesRecyclerView)
-
         recyclerView.adapter = UpdateAdapter(this, plant.plantUpdates.reversed())
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-
-        //var image = findViewById<ImageView>(R.id.imageViewUpdate)
-        //Picasso.get().load(plant.image).into(imageViewPlant);
 
         var wateringCircle = findViewById<ProgressBar>(R.id.progressBarWateringSpecific)
         var sunlightCircle = findViewById<ProgressBar>(R.id.progressBarSunlightSpecific)
@@ -59,16 +52,11 @@ class SpecificPostActivity : AppCompatActivity() {
 
         noteTextview.text = plant.note
 
-        //var heightText = findViewById<TextView>(R.id.heightSpecific)
-        //var height = plant.height
-        //heightText.text = "$height CM"
-
         var updateButton = findViewById<ImageView>(R.id.newUpdateButton)
         updateButton.setOnClickListener {
             var intent = Intent(this, UpdateActivity::class.java)
             intent.putExtra("plant", plant)
             startActivityForResult(intent, 1)
-           //startActivity(intent)
         }
     }
 
@@ -79,19 +67,17 @@ class SpecificPostActivity : AppCompatActivity() {
             if(resultCode == Activity.RESULT_OK) {
                 ////Use object
                 if (data != null) {
-                    val result = data.getSerializableExtra("result") as PlantUpdate
-                    plant.height = result.height
-                    plant.plantUpdates = plant.plantUpdates + result
-
-                    println(plant.plantUpdates.count())
-
-                    recyclerView.adapter = UpdateAdapter(this, plant.plantUpdates.reversed())
+                    updateWithNewData(data)
                 }
-
-            } else {
-                ///Do nothing
-                ///TODO: Add error message?
             }
         }
+    }
+
+    private fun updateWithNewData(data: Intent) {
+        val result = data.getSerializableExtra("result") as PlantUpdate
+        plant.height = result.height
+        plant.plantUpdates = plant.plantUpdates + result
+
+        recyclerView.adapter = UpdateAdapter(this, plant.plantUpdates.reversed())
     }
 }
