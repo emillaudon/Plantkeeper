@@ -1,18 +1,17 @@
 package com.example.plantkeeper.activities
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentActivity
 import com.example.plantkeeper.R
-import com.example.plantkeeper.models.NetworkHandler
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlin.concurrent.thread
 
 
 class LoginActivity : AppCompatActivity() {
@@ -21,9 +20,14 @@ class LoginActivity : AppCompatActivity() {
     lateinit var emailField: EditText
     lateinit var passwordField: EditText
 
+    lateinit var sharedPref: SharedPreferences
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        sharedPref = getSharedPreferences("userMail", Context.MODE_PRIVATE)
+
 
         auth = Firebase.auth
 
@@ -32,6 +36,9 @@ class LoginActivity : AppCompatActivity() {
         var loginButton = findViewById<Button>(R.id.button)
         emailField = findViewById<EditText>(R.id.emailEditText)
         passwordField = findViewById<EditText>(R.id.passwordEditText)
+
+        //Check sharedPreferences for cached email, set emailfield to it if exists, else set it to empty.
+        emailField.setText((sharedPref.getString("userEmail", "")))
 
 
 
@@ -76,12 +83,11 @@ class LoginActivity : AppCompatActivity() {
                             //Do whatever
                             println("GetTokenResult result = $idToken")
 
+                            sharedPref.edit().putString("userEmail", emailField.text.toString()).apply()
 
-                            ///TODO: Put name into user object
-
-                            ///TODO: Save to database
 
                             startActivity(Intent(this, MainActivity::class.java))
+
                 }
 
                 } else {
