@@ -15,30 +15,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plantkeeper.R
 import com.example.plantkeeper.adapters.PostAdapter
-import com.example.plantkeeper.models.NetworkHandler
-import com.example.plantkeeper.models.Plant
-import com.example.plantkeeper.models.PlantUpdate
-import com.example.plantkeeper.models.User
+import com.example.plantkeeper.models.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [HomeFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class HomeFragment(val newPlant: Plant? = null) : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RecyclerView.Adapter<PostAdapter.ViewHolder>
 
-   var list = ArrayList<PlantUpdate>()
-
+    var updateHandler = UpdateHandler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         arguments?.let {
 
@@ -56,8 +46,7 @@ class HomeFragment(val newPlant: Plant? = null) : Fragment() {
 
         val activity = requireActivity()
 
-        //list = ArrayList<PlantUpdate>()
-        adapter = PostAdapter(list, activity)
+        adapter = PostAdapter(updateHandler.list, activity)
         recyclerView.adapter = adapter
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(activity)
@@ -71,13 +60,8 @@ class HomeFragment(val newPlant: Plant? = null) : Fragment() {
                 yesButton.isVisible = false
             }
 
-            var networkHandler = NetworkHandler()
-            networkHandler.getFriendPosts() {
-                if (it.count() > 0 && list != ArrayList(it)) {
-                    list = ArrayList(it)
-
-                    update()
-                }
+            updateHandler.getFriendUpdates() {
+                update()
             }
         } else {
             yesButton.setOnClickListener {
@@ -91,9 +75,6 @@ class HomeFragment(val newPlant: Plant? = null) : Fragment() {
             }
         }
 
-
-
-        // Inflate the layout for this fragment
         return rootView
     }
 
@@ -119,16 +100,7 @@ class HomeFragment(val newPlant: Plant? = null) : Fragment() {
 
     private fun update() {
         requireActivity().runOnUiThread {
-            recyclerView.adapter = PostAdapter(list, requireActivity())
-            /*
-            adapter.notifyDataSetChanged()
-            adapter.notifyDataSetInvalidated()
-            gridView.adapter = adapter
-            adapter.notifyDataSetChanged()
-            adapter.notifyDataSetInvalidated()
-            gridView.invalidateViews()
-
-             */
+            recyclerView.adapter = PostAdapter(updateHandler.list, requireActivity())
         }
     }
 }
