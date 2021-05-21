@@ -37,12 +37,6 @@ import java.util.*
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-private const val REQUEST_EXTERNAL_STORAGE = 1
-private val PERMISSIONS_STORAGE = arrayOf(
-    Manifest.permission.READ_EXTERNAL_STORAGE,
-    Manifest.permission.WRITE_EXTERNAL_STORAGE
-)
-
 
 /**
  * A simple [Fragment] subclass.
@@ -110,8 +104,12 @@ class CreateFragment : Fragment() {
         }
 
         image.setOnClickListener {
-            verifyStoragePermissions(activity)
-            askCameraPermissions()
+            StorageHandler.verifyStoragePermissions(requireActivity())
+            var cameraPermissionOk = CameraPermissionHandler.verifyCameraPermission(requireActivity())
+            while (!cameraPermissionOk) {
+                cameraPermissionOk = CameraPermissionHandler.verifyCameraPermission(requireActivity())
+            }
+            dispatchTakePictureIntent()
         }
 
         heightTextView.setOnClickListener {
@@ -155,7 +153,8 @@ class CreateFragment : Fragment() {
 
             var photoFile: File? = null
             try {
-                photoFile = createImageFile()
+                photoFile = StorageHandler.createFile()
+                currentPhotoPath = photoFile.getAbsolutePath()
             } catch (ex: IOException) {
             }
             // Continue only if the File was successfully created
@@ -169,22 +168,6 @@ class CreateFragment : Fragment() {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
             }
 
-    }
-
-    private fun askCameraPermissions() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.CAMERA
-            ) !== PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(Manifest.permission.CAMERA),
-                CAMERA_PERM_CODE
-            )
-        } else {
-            dispatchTakePictureIntent()
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -203,22 +186,6 @@ class CreateFragment : Fragment() {
             Toast.makeText(activity, "Try Again!!", Toast.LENGTH_SHORT).show()
         }
         super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    private fun createImageFile(): File? {
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val imageFileName = "JPEG_" + timeStamp + "_"
-
-        val storageDir: File =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        val image: File = File.createTempFile(
-            imageFileName,
-            ".jpg",
-            storageDir
-        )
-
-        currentPhotoPath = image.getAbsolutePath()
-        return image
     }
 
     fun showDialogFor(bar: ProgressBar) {
@@ -287,25 +254,6 @@ class CreateFragment : Fragment() {
             d.dismiss()
         }
         d.show()
-    }
-
-    fun verifyStoragePermissions(activity: Activity?) {
-        // Check if we have write permission
-        val permission =
-            ActivityCompat.checkSelfPermission(
-                requireActivity(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            if (activity != null) {
-                ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-                )
-            }
-        }
     }
 
 

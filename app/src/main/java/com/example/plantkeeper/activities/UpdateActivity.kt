@@ -69,8 +69,13 @@ class UpdateActivity : AppCompatActivity() {
         }
 
         image.setOnClickListener {
-            verifyStoragePermissions(this)
-            askCameraPermissions()
+            StorageHandler.verifyStoragePermissions(this)
+            StorageHandler.verifyStoragePermissions(this)
+            var cameraPermissionOk = CameraPermissionHandler.verifyCameraPermission(this)
+            while (!cameraPermissionOk) {
+                cameraPermissionOk = CameraPermissionHandler.verifyCameraPermission(this)
+            }
+            dispatchTakePictureIntent()
         }
 
         updateButton.setOnClickListener {
@@ -96,28 +101,13 @@ class UpdateActivity : AppCompatActivity() {
         }
     }
 
-    private fun createImageFile(): File? {
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val imageFileName = "JPEG_" + timeStamp + "_"
-
-        val storageDir: File =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        val image: File = File.createTempFile(
-            imageFileName,
-            ".jpg",
-            storageDir
-        )
-
-        currentPhotoPath = image.getAbsolutePath()
-        return image
-    }
-
     private fun dispatchTakePictureIntent() {
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
         var photoFile: File? = null
         try {
-            photoFile = createImageFile()
+            photoFile = StorageHandler.createFile()
+            currentPhotoPath = photoFile.getAbsolutePath()
         } catch (ex: IOException) {
         }
         // Continue only if the File was successfully created
@@ -131,22 +121,6 @@ class UpdateActivity : AppCompatActivity() {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
         }
 
-    }
-
-    private fun askCameraPermissions() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) !== PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.CAMERA),
-                101
-            )
-        } else {
-            dispatchTakePictureIntent()
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -191,22 +165,5 @@ class UpdateActivity : AppCompatActivity() {
             d.dismiss()
         }
         d.show()
-    }
-
-    fun verifyStoragePermissions(activity: Activity?) {
-        val permission =
-            ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            if (activity != null) {
-                ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-                )
-            }
-        }
     }
 }
