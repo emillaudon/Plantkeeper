@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.Layout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,10 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.example.plantkeeper.BuildConfig
 import com.example.plantkeeper.R
-import com.example.plantkeeper.models.NetworkHandler
-import com.example.plantkeeper.models.Plant
-import com.example.plantkeeper.models.PlantUpdate
-import com.example.plantkeeper.models.User
+import com.example.plantkeeper.models.*
 import kotlinx.android.synthetic.main.fragment_create.*
 import java.io.File
 import java.io.IOException
@@ -53,9 +51,8 @@ private val PERMISSIONS_STORAGE = arrayOf(
  * create an instance of this fragment.
  */
 class CreateFragment : Fragment() {
-    // TODO: Rename and change types of parameters
     val CAMERA_PERM_CODE: Int = 101
-    private var RESULT_LOAD_IMAGE: Int = 1
+
     val REQUEST_IMAGE_CAPTURE = 1
 
     lateinit var saveButton: Button
@@ -75,6 +72,8 @@ class CreateFragment : Fragment() {
 
     lateinit var currentPhotoPath: String
 
+    lateinit var rootView: View
+
     var height: Double = -10.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +89,7 @@ class CreateFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val rootView = inflater.inflate(R.layout.fragment_create, container, false)
+        rootView = inflater.inflate(R.layout.fragment_create, container, false)
         saveButton = rootView.findViewById(R.id.savebutton)
         image = rootView.findViewById(R.id.imageChosen)
 
@@ -111,7 +110,6 @@ class CreateFragment : Fragment() {
             }
         }
 
-
         image.setOnClickListener {
             verifyStoragePermissions(activity)
             askCameraPermissions()
@@ -121,38 +119,36 @@ class CreateFragment : Fragment() {
             showDialogForHeight()
         }
 
-
-
         saveButton.setOnClickListener {
-            val text = rootView.findViewById<EditText>(R.id.updateNote).text.toString()
-
-            val watering = wateringBar.progress
-            val temperature = temperatureBar.progress
-            val sunlight = sunlightBar.progress
-
-            var listOfUpdates = mutableListOf<PlantUpdate>()
-            listOfUpdates.add(PlantUpdate(height, "placeHolder", "placeHolder", "100", 1, User.name))
-
-            imgPath = currentPhotoPath
-
-            val newPost = Plant(imgPath, text, watering, temperature, sunlight, noteEditText.text.toString(), height, "placeHolder", listOfUpdates, 1)
-            val handler = NetworkHandler()
-
-            handler.newPlant(newPost, imgPath)
-
-            println(imgPath)
-            println("number two")
-
-            val newFragment: Fragment = HomeFragment()
-            val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
-
-            transaction.replace(R.id.flFragment, newFragment)
-            transaction.addToBackStack(null)
-
-            transaction.commit()
+            savePlantAndGoBack()
         }
 
         return rootView
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun savePlantAndGoBack() {
+        val text = rootView.findViewById<EditText>(R.id.updateNote).text.toString()
+
+        val watering = wateringBar.progress
+        val temperature = temperatureBar.progress
+        val sunlight = sunlightBar.progress
+        imgPath = currentPhotoPath
+
+        var listOfUpdates = mutableListOf<PlantUpdate>()
+        listOfUpdates.add(PlantUpdate(height, "placeHolder", "placeHolder", "100", 1, User.name))
+        val newPost = Plant(imgPath, text, watering, temperature, sunlight, noteEditText.text.toString(), height, "placeHolder", listOfUpdates, 1)
+
+        var plantHandler = PlantHandler()
+        plantHandler.createNewPlant(newPost)
+
+        val newFragment: Fragment = HomeFragment()
+        val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
+
+        transaction.replace(R.id.flFragment, newFragment)
+        transaction.addToBackStack(null)
+
+        transaction.commit()
     }
 
     private fun dispatchTakePictureIntent() {

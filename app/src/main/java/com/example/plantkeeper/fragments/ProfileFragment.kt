@@ -16,6 +16,7 @@ import com.example.plantkeeper.activities.MainActivity
 import com.example.plantkeeper.activities.SpecificPostActivity
 import com.example.plantkeeper.models.NetworkHandler
 import com.example.plantkeeper.models.Plant
+import com.example.plantkeeper.models.PlantHandler
 import com.example.plantkeeper.models.PlantSorter
 import com.example.plantkeeper.models.PlantSorter.Companion.bubbleSort
 import kotlin.concurrent.thread
@@ -32,10 +33,10 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class ProfileFragment : Fragment() {
+    var plantHandler = PlantHandler()
+
     lateinit var gridView: GridView
     lateinit var adapter: ProfilePostAdapter
-
-    var plantList = emptyArray<Plant>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,39 +50,24 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        println("now1")
         var rootView = inflater.inflate(R.layout.fragment_profile, container, false)
         gridView = rootView.findViewById(R.id.profileGrid)
 
-        if(plantList.count() > 0) {
-            gridView.adapter = ProfilePostAdapter(requireContext(), plantList)
+        if(plantHandler.plantList.count() > 0) {
+            gridView.adapter = ProfilePostAdapter(requireContext(), plantHandler.plantList)
         }
 
         gridView.onItemClickListener =
             OnItemClickListener { parent, view, position, id ->
                 var intent = Intent(context, SpecificPostActivity::class.java)
-                var plant = plantList[position]
+                var plant = plantHandler.plantList[position]
                 intent.putExtra("plant", plant)
                 startActivity(intent)
             }
 
-
-        val handler = NetworkHandler()
-        thread {
-            println("getting")
-            handler.getUserPosts {
-                println("done")
-                println(it.count())
-                println(plantList.count())
-                if (it.count() > plantList.count()) {
-                    plantList = it.toTypedArray()
-                    plantList = plantList.bubbleSort()
-                    print("updating")
-                    update()
-                }
-
-            }
-        }.run()
+        plantHandler.getUserPlants() {
+            update()
+        }
 
         return rootView
     }
@@ -108,17 +94,9 @@ class ProfileFragment : Fragment() {
     }
 
     private fun update() {
-        activity!!.runOnUiThread {
-            gridView.adapter = ProfilePostAdapter(requireContext(), plantList)
-            /*
-            adapter.notifyDataSetChanged()
-            adapter.notifyDataSetInvalidated()
-            gridView.adapter = adapter
-            adapter.notifyDataSetChanged()
-            adapter.notifyDataSetInvalidated()
-            gridView.invalidateViews()
+        requireActivity().runOnUiThread {
+            gridView.adapter = ProfilePostAdapter(requireContext(), plantHandler.plantList)
 
-             */
         }
     }
 }
