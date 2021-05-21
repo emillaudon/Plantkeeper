@@ -161,30 +161,9 @@ class UpdateActivity : AppCompatActivity() {
             val contentUri = Uri.fromFile(f)
             mediaScanIntent.data = contentUri
             this.sendBroadcast(mediaScanIntent)
-        } else if (data != null ) {
-            print("ffffff2")
-            print(resultCode)
-            val selectedImage: Uri? = data.data
-            val filePathColumn =
-                arrayOf(MediaStore.Images.Media.DATA)
-            val cursor = contentResolver?.query(
-                selectedImage!!,
-                filePathColumn, null, null, null
-            )
-            cursor?.moveToFirst()
-
-            val columnIndex = cursor?.getColumnIndex(filePathColumn[0])
-            val picturePath = cursor?.getString(columnIndex!!)
-            cursor?.close()
-
-            img = BitmapFactory.decodeFile(picturePath)
-            image.setImageBitmap(img)
-            image.scaleType = ImageView.ScaleType.CENTER_CROP;
-
-        } else {
+        }  else {
             Toast.makeText(this, "Try Again!!", Toast.LENGTH_SHORT).show()
         }
-
     }
 
     fun showDialogForHeight() {

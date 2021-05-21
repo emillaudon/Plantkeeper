@@ -199,25 +199,6 @@ class CreateFragment : Fragment() {
             val contentUri = Uri.fromFile(f)
             mediaScanIntent.data = contentUri
             requireContext().sendBroadcast(mediaScanIntent)
-        } else if (data != null) {
-            /// Code for using gallery for later
-            val selectedImage: Uri? = data.data
-            val filePathColumn =
-                arrayOf(MediaStore.Images.Media.DATA)
-            val cursor = activity?.contentResolver?.query(
-                selectedImage!!,
-                filePathColumn, null, null, null
-            )
-            cursor?.moveToFirst()
-
-            val columnIndex = cursor?.getColumnIndex(filePathColumn[0])
-            val picturePath = cursor?.getString(columnIndex!!)
-            cursor?.close()
-            imgPath = picturePath!!
-            img = BitmapFactory.decodeFile(picturePath)
-            image.setImageBitmap(img)
-            image.scaleType = ImageView.ScaleType.CENTER_CROP;
-
         } else {
             Toast.makeText(activity, "Try Again!!", Toast.LENGTH_SHORT).show()
         }

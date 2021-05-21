@@ -64,7 +64,6 @@ class NetworkHandler {
                                         }
                                     }
                                 }
-
                             }
                             callback(updatesList)
                         }
