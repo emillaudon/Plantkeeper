@@ -10,6 +10,7 @@ import android.widget.EditText
 import androidx.fragment.app.FragmentTransaction
 import com.example.plantkeeper.R
 import com.example.plantkeeper.models.NetworkHandler
+import com.example.plantkeeper.models.User
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -49,6 +50,7 @@ class AddFriendFragment : Fragment() {
 
             var networkHandler = NetworkHandler()
             networkHandler.addFriend(emailToAdd) {
+                User.friendCount = User.friendCount + 1
                 val newFragment: Fragment = HomeFragment()
                 val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
 

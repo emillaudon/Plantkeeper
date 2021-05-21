@@ -190,7 +190,7 @@ class NetworkHandler {
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
-    fun getUserData(callback: (result: String) -> Unit) {
+    fun getUserData(callback: (result: JSONObject) -> Unit) {
         val auth = Firebase.auth
         val user = auth.currentUser
 
@@ -216,7 +216,7 @@ class NetworkHandler {
                                 it.lines().forEach { line ->
                                     println(line)
                                     var jsonObject = JSONObject(line)
-                                    callback(jsonObject["name"] as String)
+                                    callback(jsonObject)
                                 }
                             }
                         }

@@ -18,6 +18,7 @@ import com.example.plantkeeper.adapters.PostAdapter
 import com.example.plantkeeper.models.NetworkHandler
 import com.example.plantkeeper.models.Plant
 import com.example.plantkeeper.models.PlantUpdate
+import com.example.plantkeeper.models.User
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -33,7 +34,7 @@ class HomeFragment(val newPlant: Plant? = null) : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RecyclerView.Adapter<PostAdapter.ViewHolder>
 
-    lateinit var list: ArrayList<PlantUpdate>
+   var list = ArrayList<PlantUpdate>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +56,7 @@ class HomeFragment(val newPlant: Plant? = null) : Fragment() {
 
         val activity = requireActivity()
 
-        list = ArrayList<PlantUpdate>()
+        //list = ArrayList<PlantUpdate>()
         adapter = PostAdapter(list, activity)
         recyclerView.adapter = adapter
         recyclerView.setHasFixedSize(true)
@@ -64,36 +65,30 @@ class HomeFragment(val newPlant: Plant? = null) : Fragment() {
         var yesButton = rootView.findViewById<Button>(R.id.addFriendButton)
         var addFriendText = rootView.findViewById<TextView>(R.id.noFriendsTextView)
 
-        var networkHandler = NetworkHandler()
-        networkHandler.getFriendPosts() {
-            if (it.count() > 0) {
-                list = ArrayList(it)
-
-                requireActivity().runOnUiThread {
-                    addFriendText.isVisible = false
-                    yesButton.isVisible = false
-                }
-
-                update()
-            } else {
-
-
-
-                yesButton.setOnClickListener {
-                    val newFragment: Fragment = AddFriendFragment()
-                    val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
-
-                    transaction.replace(R.id.flFragment, newFragment)
-                    transaction.addToBackStack(null)
-
-                    transaction.commit()
-                }
+        if (User.friendCount > 0) {
+            requireActivity().runOnUiThread {
+                addFriendText.isVisible = false
+                yesButton.isVisible = false
             }
 
+            var networkHandler = NetworkHandler()
+            networkHandler.getFriendPosts() {
+                if (it.count() > 0) {
+                    list = ArrayList(it)
 
+                    update()
+                }
+            }
+        } else {
+            yesButton.setOnClickListener {
+                val newFragment: Fragment = AddFriendFragment()
+                val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
 
+                transaction.replace(R.id.flFragment, newFragment)
+                transaction.addToBackStack(null)
 
-
+                transaction.commit()
+            }
         }
 
 

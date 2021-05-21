@@ -91,8 +91,8 @@ class LoginActivity : AppCompatActivity() {
                             sharedPref.edit().putString("userEmail", emailField.text.toString()).apply()
 
                             var n = NetworkHandler()
-                            n.getUserData {userName ->
-                                User(userName)
+                            n.getUserData {userData ->
+                                User(userData)
                                 startActivity(Intent(this, MainActivity::class.java))
                             }
                 }
