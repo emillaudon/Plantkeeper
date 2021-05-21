@@ -48,21 +48,23 @@ class AddFriendFragment : Fragment() {
             var emailEditText = rootView.findViewById<EditText>(R.id.emailFriendEditText)
             var emailToAdd = emailEditText.text.toString()
 
-            var networkHandler = NetworkHandler()
-            networkHandler.addFriend(emailToAdd) {
-                User.friendCount = User.friendCount + 1
-                val newFragment: Fragment = HomeFragment()
-                val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
-
-                transaction.replace(R.id.flFragment, newFragment)
-                transaction.addToBackStack(null)
-
-                transaction.commit()
+            User.addNewFriend(emailToAdd) {
+                goBackToHome()
             }
         }
 
 
         return rootView
+    }
+
+    fun goBackToHome() {
+        val newFragment: Fragment = HomeFragment()
+        val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
+
+        transaction.replace(R.id.flFragment, newFragment)
+        transaction.addToBackStack(null)
+
+        transaction.commit()
     }
 
     companion object {

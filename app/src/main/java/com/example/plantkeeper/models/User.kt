@@ -3,7 +3,11 @@ package com.example.plantkeeper.models
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
+import com.example.plantkeeper.R
 import com.example.plantkeeper.activities.MainActivity
+import com.example.plantkeeper.fragments.HomeFragment
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -38,6 +42,13 @@ object User {
     fun getUserData(callback: (JSONObject) -> Unit) {
         networkHandler.getUserData {userData ->
             callback(userData)
+        }
+    }
+
+    fun addNewFriend(emailToAdd: String, callback: () -> Unit) {
+        networkHandler.addFriend(emailToAdd) {
+            this.friendCount = User.friendCount + 1
+            callback()
         }
     }
 }
