@@ -3,12 +3,16 @@ package com.example.plantkeeper.activities
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.plantkeeper.R
+import com.example.plantkeeper.models.NetworkHandler
+import com.example.plantkeeper.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -70,6 +74,7 @@ class LoginActivity : AppCompatActivity() {
         return emailField.text.toString() != "" && passwordField.text.toString() != ""
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     fun login(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
@@ -85,9 +90,11 @@ class LoginActivity : AppCompatActivity() {
 
                             sharedPref.edit().putString("userEmail", emailField.text.toString()).apply()
 
-
-                            startActivity(Intent(this, MainActivity::class.java))
-
+                            var n = NetworkHandler()
+                            n.getUserData {userName ->
+                                User(userName)
+                                startActivity(Intent(this, MainActivity::class.java))
+                            }
                 }
 
                 } else {

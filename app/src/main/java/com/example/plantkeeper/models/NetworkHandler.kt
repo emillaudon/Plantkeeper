@@ -190,6 +190,48 @@ class NetworkHandler {
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
+    fun getUserData(callback: (result: String) -> Unit) {
+        val auth = Firebase.auth
+        val user = auth.currentUser
+
+        val url = URL(userUrl + "/" + user.uid)
+
+        user.getIdToken(true)
+            .addOnSuccessListener { result ->
+                val idToken = result.token
+                println("GetTokenResult result = $idToken")
+                val bearerToken = idToken
+
+                val thread = Thread(Runnable {
+                    try {
+                        val connection = url.openConnection()
+                        connection.setRequestProperty("Bearer", bearerToken)
+
+                        with(url.openConnection() as HttpURLConnection) {
+                            requestMethod = "GET"  // optional default is GET
+                            setRequestProperty("Authorization", "Bearer " + bearerToken)
+
+                            inputStream.bufferedReader().use {
+                                var plantsList = mutableListOf<Plant>()
+                                it.lines().forEach { line ->
+                                    println(line)
+                                    var jsonObject = JSONObject(line)
+                                    callback(jsonObject["name"] as String)
+                                }
+                            }
+                        }
+
+                    } catch (e: Exception) {
+                        println(e)
+
+                    }
+                })
+                thread.start()
+            }
+    }
+
+
+        @RequiresApi(Build.VERSION_CODES.N)
     fun getUserPosts(callback: (result: List<Plant>) -> Unit) {
         val auth = Firebase.auth
         val user = auth.currentUser
@@ -199,9 +241,8 @@ class NetworkHandler {
         user.getIdToken(true)
             .addOnSuccessListener { result ->
                 val idToken = result.token
-                //Do whatever
+
                 println("GetTokenResult result = $idToken")
-                println("kkkk")
 
                 val bearerToken = idToken
 

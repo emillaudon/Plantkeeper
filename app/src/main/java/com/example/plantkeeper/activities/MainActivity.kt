@@ -3,6 +3,7 @@ package com.example.plantkeeper.activities
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -12,6 +13,7 @@ import com.example.plantkeeper.fragments.CreateFragment
 import com.example.plantkeeper.fragments.HomeFragment
 import com.example.plantkeeper.fragments.ProfileFragment
 import com.example.plantkeeper.models.NetworkHandler
+import com.example.plantkeeper.models.User
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -27,6 +29,10 @@ class MainActivity : AppCompatActivity() {
         val createFragment=CreateFragment()
 
         setCurrentFragment(homeFragment)
+
+        var userNameTextView = findViewById<TextView>(R.id.userNameTextView)
+        var userName = User.name
+        userNameTextView.text = userName
 
 
         bottomNavigationView.setOnNavigationItemSelectedListener {
@@ -44,9 +50,7 @@ class MainActivity : AppCompatActivity() {
         resultCode: Int,
         data: Intent?
     ) {
-        print("fjkajfa")
         super.onActivityResult(requestCode, resultCode, data)
-        print(data)
         val fragment =supportFragmentManager.findFragmentById(R.id.addfragment)
         fragment?.onActivityResult(requestCode, resultCode, data)
     }
