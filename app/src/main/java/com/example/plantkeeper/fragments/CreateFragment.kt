@@ -44,9 +44,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class CreateFragment : Fragment() {
-    val CAMERA_PERM_CODE: Int = 101
-
-    val REQUEST_IMAGE_CAPTURE = 1
+     val REQUEST_IMAGE_CAPTURE = 1
 
     lateinit var saveButton: Button
 
