@@ -143,6 +143,7 @@ class CreateFragment : Fragment() {
         transaction.replace(R.id.flFragment, newFragment)
         transaction.addToBackStack(null)
 
+        resetFragment()
         transaction.commit()
     }
 
@@ -252,6 +253,18 @@ class CreateFragment : Fragment() {
             d.dismiss()
         }
         d.show()
+    }
+
+    fun resetFragment() {
+        wateringBar.progress = 0
+        sunlightBar.progress = 0
+        temperatureBar.progress = 0
+
+        heightTextView.text = "- CM"
+
+        noteEditText.setText("")
+
+        rootView.findViewById<EditText>(R.id.updateNote).setText("")
     }
 
 
