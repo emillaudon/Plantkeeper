@@ -17,6 +17,7 @@ import com.example.plantkeeper.fragments.CreateFragment
 import com.example.plantkeeper.fragments.HomeFragment
 import com.example.plantkeeper.fragments.ProfileFragment
 import com.example.plantkeeper.models.NetworkHandler
+import com.example.plantkeeper.models.PlantImageCacheHandler
 import com.example.plantkeeper.models.User
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -27,6 +28,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        PlantImageCacheHandler.createCache()
 
         val homeFragment=HomeFragment()
         val profileFragment=ProfileFragment()

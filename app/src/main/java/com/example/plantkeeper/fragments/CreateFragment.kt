@@ -1,24 +1,17 @@
 package com.example.plantkeeper.fragments
 
-import android.Manifest
-import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -28,8 +21,6 @@ import com.example.plantkeeper.models.*
 import kotlinx.android.synthetic.main.fragment_create.*
 import java.io.File
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -231,8 +222,8 @@ class CreateFragment : Fragment() {
         d.setTitle("Height in MM")
         var titleText = "Height in MM"
         d.setContentView(R.layout.dialog)
-        val b1 = d.findViewById(R.id.setButton) as Button
-        val b2 = d.findViewById(R.id.cancelButton) as Button
+        val setButton = d.findViewById(R.id.setButton) as Button
+        val cancelButton = d.findViewById(R.id.cancelButton) as Button
         val title = d.findViewById(R.id.dialogTitle) as TextView
         val np = d.findViewById(R.id.numberPicker1) as NumberPicker
         if (height > 0.0) {
@@ -244,12 +235,12 @@ class CreateFragment : Fragment() {
         np.minValue = 0
         np.wrapSelectorWheel = false
 
-        b1.setOnClickListener {
+        setButton.setOnClickListener {
             height = np.value.toDouble() / 10.0
             heightTextView.text = "$height CM"
             d.dismiss()
         }
-        b2.setOnClickListener{
+        cancelButton.setOnClickListener{
             d.dismiss()
         }
         d.show()

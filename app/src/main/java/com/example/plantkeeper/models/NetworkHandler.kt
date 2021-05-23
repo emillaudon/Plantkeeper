@@ -1,17 +1,16 @@
 package com.example.plantkeeper.models
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
-import android.provider.MediaStore.Images
 import androidx.annotation.RequiresApi
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
@@ -24,6 +23,29 @@ class NetworkHandler {
 
     private val auth = Firebase.auth
     val user = auth.currentUser
+
+    companion object {
+        fun isOnline(context: Context): Boolean {
+            val connManager =
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val capabilities =
+                connManager.getNetworkCapabilities(connManager.activeNetwork)
+            if (capabilities != null) {
+                when {
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
+                        return true
+                    }
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> {
+                        return true
+                    }
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
+                        return true
+                    }
+                }
+            }
+            return false
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun getFriendPosts(callback: (List<PlantUpdate>) -> Unit) {

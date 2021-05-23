@@ -9,7 +9,7 @@ import org.junit.Test
 import org.junit.Assert.*
 
 
-class ExampleUnitTest {
+class UnitTest {
 
     ///Tests if plants are sorted correctly according to creationtime, the plant with the highest creationtime should be first.
     @Test

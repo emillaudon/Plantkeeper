@@ -1,5 +1,4 @@
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,8 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.plantkeeper.R
 import com.example.plantkeeper.models.Plant
+import com.example.plantkeeper.models.PlantImageCacheHandler
 import com.squareup.picasso.Picasso
-import java.net.URL
 
 
 class ProfilePostAdapter(
@@ -41,11 +40,27 @@ class ProfilePostAdapter(
         if (convertView == null) {
             convertView = layourInflater!!.inflate(R.layout.profile_row_item, parent, false)
         }
-        imageView = convertView!!.findViewById(R.id.imageView)
+        imageView = convertView!!.findViewById(R.id.imageViewLogo)
         textview = convertView!!.findViewById(R.id.textView)
         textview.text = plants[position].name
 
-        Picasso.get().load(plants[position].image).into(imageView);
+        if (position == 0) {
+            if (!PlantImageCacheHandler.isCached()) {
+                Picasso.get().load(plants[position].image).into(imageView);
+                PlantImageCacheHandler.cacheImage(plants[position].image)
+                println("not cached")
+            } else {
+                var image = PlantImageCacheHandler.getImage()
+                imageView.setImageBitmap(image)
+                println("cached")
+            }
+
+        } else {
+            Picasso.get().load(plants[position].image).into(imageView);
+        }
+
+
+
 
         return convertView
     }

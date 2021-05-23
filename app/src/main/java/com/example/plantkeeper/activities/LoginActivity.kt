@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.plantkeeper.R
+import com.example.plantkeeper.models.NetworkHandler
 import com.example.plantkeeper.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -30,25 +31,41 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        isConnected()
+
         sharedPref = getSharedPreferences("userMail", Context.MODE_PRIVATE)
         auth = Firebase.auth
 
-        var loginButton = findViewById<Button>(R.id.button)
+        var loginButton = findViewById<Button>(R.id.loginButton)
         emailField = findViewById<EditText>(R.id.emailEditText)
         passwordField = findViewById<EditText>(R.id.passwordEditText)
 
         //Check sharedPreferences for cached email, set emailfield to it if exists, else set it to empty.
         emailField.setText((sharedPref.getString("userEmail", "")))
 
+
+
         var registerButton = findViewById<Button>(R.id.registerButton)
 
         registerButton.setOnClickListener {
-            loginButtonClicked()
+            if (isConnected()) {
+                registerButtonClicked()
+            }
         }
 
         loginButton.setOnClickListener {
-            registerButtonClicked()
+            if (isConnected()) {
+                loginButtonClicked()
+            }
         }
+    }
+
+    private fun isConnected() : Boolean {
+        if (!NetworkHandler.isOnline(this)) {
+            Toast.makeText(baseContext, "You need to be connected to the internet to use this application.", Toast.LENGTH_LONG)
+            return false
+        }
+        return true
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -75,8 +92,9 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
+
     @RequiresApi(Build.VERSION_CODES.N)
-    private fun registerButtonClicked() {
+    private fun loginButtonClicked() {
         var email = emailField.text.toString()
         var password = passwordField.text.toString()
         if (credentialsFilledOut()) {
@@ -86,7 +104,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun loginButtonClicked() {
+    private fun registerButtonClicked() {
         var email = emailField.text.toString()
         var password = passwordField.text.toString()
         if (credentialsFilledOut()) {
