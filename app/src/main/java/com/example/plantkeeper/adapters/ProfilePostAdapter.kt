@@ -7,7 +7,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.plantkeeper.R
 import com.example.plantkeeper.models.Plant
-import com.example.plantkeeper.models.PlantImageCacheHandler
 import com.squareup.picasso.Picasso
 
 
@@ -44,23 +43,7 @@ class ProfilePostAdapter(
         textview = convertView!!.findViewById(R.id.textView)
         textview.text = plants[position].name
 
-        if (position == 0) {
-            if (!PlantImageCacheHandler.isCached()) {
-                Picasso.get().load(plants[position].image).into(imageView);
-                PlantImageCacheHandler.cacheImage(plants[position].image)
-                println("not cached")
-            } else {
-                var image = PlantImageCacheHandler.getImage()
-                imageView.setImageBitmap(image)
-                println("cached")
-            }
-
-        } else {
-            Picasso.get().load(plants[position].image).into(imageView);
-        }
-
-
-
+        Picasso.get().load(plants[position].image).into(imageView);
 
         return convertView
     }
